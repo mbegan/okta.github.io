@@ -10,6 +10,7 @@ addons:
     packages:
       - ca-certificates
       - curl
+      - libcurl3
 
 before_install:
   - gem update bundler
