@@ -9,6 +9,7 @@ addons:
   apt:
     packages:
       - ca-certificates
+      - curl
 
 before_install:
   - gem update bundler
