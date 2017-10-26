@@ -19,7 +19,6 @@ before_install:
 
 script: ./scripts/travis.sh
 
-sudo: required
 dist: trusty
 
 env:
