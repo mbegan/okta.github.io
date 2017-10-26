@@ -17,7 +17,7 @@ This page will give you an overview of OAuth 2.0 and OpenID Connect and their Ok
 
 There are three major kinds of authentication that you can perform with Okta:
 
-- The [Authentication API](/docs/api/resources/authn.html) controls access to the Okta API. It provides operations to authenticate users, perform multi-factor enrollment and verification, recover forgotten passwords, and unlock accounts. It is the underlying API that the Okta Sign-in Widget and Auth JS use under the hood.
+- The [Authentication API](/docs/api/resources/authn.html) controls access to your Okta org and applications. It provides operations to authenticate users, perform multi-factor enrollment and verification, recover forgotten passwords, and unlock accounts. It is the underlying API that the Okta Sign-in Widget and Auth JS use under the hood.
 - The [OAuth 2.0](/docs/api/resources/oauth2.html) protocol controls authorization to access a protected resource, like your web app, native app, or API service.
 - The [OpenID Connect](/docs/api/resources/oidc.html) protocol is built on the OAuth 2.0 protocol and helps authenticate users and convey information about them. It is also more opinionated than plain OAuth 2.0, for example in its scope definitions.
 
@@ -27,11 +27,13 @@ If you are interested in controlling access to your own application, then use th
 
 ### Authentication API
 
-The Okta Authentication API controls access to the Okta API by creating and controlling Okta session tokens. Okta session tokens are one-time bearer tokens issued when the authentication transaction completes successfully. Session tokens may be redeemed for a session in Okta's Session API or converted to a session cookie. 
+The Okta Authentication API controls access to your Okta org and applications by creating and controlling Okta session tokens. Okta session tokens are one-time tokens issued when the authentication transaction completes successfully. Session tokens may be redeemed for a session in Okta's Session API or converted to a session cookie. 
 
-Session tokens are for use within Okta, while ID tokens, access tokens, and refresh tokens are for use when accessing third party resources, such as your application.
+Session tokens are for use within Okta, while ID tokens, access tokens, and refresh tokens are usually for accessing third party resources, such as your application.
 
-You can find out more in the [Authentication API Reference](/docs/api/resources/authn.html).
+The Authentication API is used by the Okta Sign-In Widget as well as the AuthJS library. Both AuthJS and the Authentication API are intended for advanced use cases.
+
+You can find out more about the Authentication API in our [API Reference](/docs/api/resources/authn.html).
 
 ### OAuth 2.0
 
@@ -61,6 +63,13 @@ The usual OAuth 2.0 grant flow looks like this:
 > 
 > If you'd like to see the OAuth 2.0 spec, you can find it here: <https://tools.ietf.org/html/rfc6749>
 
+At the core of both OAuth 2.0 and its OpenID Connect extension is the authorization server. An authorization server is simply an OAuth 2.0 token minting engine. Each authorization server has a unique issuer URI
+and its own signing key for tokens in order to keep proper boundary between security domains. In the context of this guide, Okta is your authorization server.
+
+The authorization server also acts as an OpenID Connect Provider,
+which means you can request [ID tokens](/standards/OIDC/index#id-token)
+in addition to [access tokens](/standards/OAuth/#access-token) from the authorization server endpoints.
+
 ### OpenID Connect
 
 OpenID Connect is an authentication standard built on top of OAuth 2.0. It adds an additional token called an ID token. OpenID Connect also standardizes areas that OAuth 2.0 leaves up to choice, such as scopes, endpoint discovery, and dynamic registration of clients. Okta is [OpenID Certified](https://openid.net/certification/).
@@ -83,8 +92,6 @@ The high-level flow looks the same for both OIDC and regular OAuth 2.0 flows, th
 Depending on what kind of client you are building, you will want to use a different OAuth 2.0 flow. The flowchart below can quickly help you decide which flow to use. Further explanation about each flow is included below.
 
 {% img oauth_grant_flowchart.png alt:"OAuth Flow Diagram" width:"800px" %}
-
-(This is probably not the best way to render this diagram, but until the flow itself is approved I'll leave it in this format)
 
 <!-- Source for image. Generated using http://www.plantuml.com/plantuml/uml/
 
