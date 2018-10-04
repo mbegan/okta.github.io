@@ -32,7 +32,7 @@ You set up your OpenID Connect application inside the Okta Developer Console:
 To get an authorization code, you make a request to your authorization server's `/authorize` endpoint. If you are using the default Okta authorization server, then your request URL would look something like this:
 
 ```
-https://{yourOktaDomain}.com/oauth2/default/v1/authorize?client_id=0oabucvy
+https://{yourOktaDomain}/oauth2/default/v1/authorize?client_id=0oabucvy
 c38HLL1ef0h7&response_type=code&scope=openid&redirect_uri=http%3A%2F%2Flocal
 host%3A8080&state=state-296bc9a0-a2a2-4a57-be1a-d0e2fd9bb601'
 ```
@@ -41,11 +41,11 @@ Note the parameters that are being passed:
 
 - `client_id` matches the Client ID of your Okta OAuth application that you created above. You can find it at the bottom of your application's General tab.
 - `response_type` is `code`, indicating that we are using the authorization code grant type.
-- `scope` is `openid`, which means that the `/token` endpoint will return an ID token. For more information about scopes, see [here](/standards/OIDC/index.html#scopes).
+- `scope` is `openid`, which means that the `/token` endpoint will return an ID token. For more information about scopes, see [here](/docs/api/resources/oidc#scopes).
 - `redirect_uri` is the callback location where the user-agent will be directed to along with the `code`. This must match one of the "Login redirect URIs" you specified when you were creating your Okta application in Step 1.
 - `state` is an arbitrary alphanumeric string that the authorization server will reproduce when redirecting the user-agent back to the client. This is used to help prevent cross-site request forgery.
 
-For more information on these parameters, see [the OAuth 2.0 API reference](/docs/api/resources/oauth2.html#obtain-an-authorization-grant-from-a-user).
+For more information on these parameters, see [the OAuth 2.0 API reference](/docs/api/resources/oidc#authorize).
 
 If the user does not have an existing session, this will open the Okta Sign-in Page. If they have an existing session, or after they authenticate, they will arrive at the specified `redirect_uri` along with a `code`:
 
@@ -62,14 +62,14 @@ To exchange this code for access and ID tokens, you pass it to your authorizatio
 
 ```
 curl --request POST \
-  --url https://{yourOktaDomain}.com/oauth2/default/v1/token \
+  --url https://{yourOktaDomain}/oauth2/default/v1/token \
   --header 'accept: application/json' \
   --header 'authorization: Basic MG9hY...' \
   --header 'content-type: application/x-www-form-urlencoded' \
   --data 'grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A8080&code=P59yPm1_X1gxtdEOEZjn'
 ```
 
-> Important: The call to the `/token` endpoint requires authentication. In this case, it is a Basic Auth digest of the client ID and secret. You can find the client ID and secret in your application's General tab. This requirement is why this call is only appropriate for applications that can guarantee the secrecy of the client secret. For more on Basic Auth, please see [Token Authentication Methods](https://developer.okta.com/docs/api/resources/oauth2.html#token-authentication-methods).
+> Important: The call to the `/token` endpoint requires authentication. In this case, it is a Basic Auth digest of the client ID and secret. You can find the client ID and secret in your application's General tab. This requirement is why this call is only appropriate for applications that can guarantee the secrecy of the client secret. For more on Basic Auth, please see [Token Authentication Methods](https://developer.okta.com/docs/api/resources/oidc#token-authentication-methods).
 
 Note the parameters that are being passed:
 
@@ -77,7 +77,7 @@ Note the parameters that are being passed:
 - `redirect_uri` must match the URI that was used to get the authorization code.
 - `code` is the authorization code that you got from the `/authorize` endpoint.
 
-For more information on these parameters, see the [OAuth 2.0 API reference](https://developer.okta.com/docs/api/resources/oauth2.html#request-a-token).
+For more information on these parameters, see the [OAuth 2.0 API reference](https://developer.okta.com/docs/api/resources/oidc#token).
 
 If the code is still valid, your application will receive back access and ID tokens:
 
@@ -104,4 +104,3 @@ The following web application examples show you the authorization code flow, as 
 | <i class="icon code-dotnet-32"></i> | ASP.NET Core | <https://github.com/oktadeveloper/okta-aspnetcore-mvc-example> |
 | <i class="icon code-nodejs-32"></i> | Express.js   | <https://github.com/okta/samples-nodejs-express-4>             |
 | <i class="icon code-java-32"></i>   | Spring       | <https://github.com/okta/samples-java-spring-mvc>              |
-| <i class="icon code-php-32"></i>    | Symphony     | <https://github.com/okta/samples-php-symfony>                  |

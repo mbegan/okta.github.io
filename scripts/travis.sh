@@ -7,34 +7,27 @@ if [[ $TRAVIS_EVENT_TYPE != 'push' ]]; then
   export CHROME_HEADLESS=true
 fi
 
-# 2. Run the npm install to pull in test dependencies
+# Run the npm install to pull in test dependencies
 fold npm_install npm install
 
-# 3. Build site and Run tests
+# Run markdown Lint check
+fold npm_markdown_lint npm run markdown-lint
+
+# Build site and Run tests
 fold npm_test npm test
 
-export GENERATED_SITE_LOCATION="dist"
-
-# 4. copy assets and previous history into dist
-fold npm_postbuild_prod npm run postbuild-prod
-
-# 5. Run Lint checker
-fold npm_lint npm run post-build-lint
-
-if ! url_consistency_check || ! duplicate_slug_in_url || ! check_for_localhost_links || ! check_index_links; then
-  echo "FAILED LINT CHECK!"
-  exit 1;
+# Run External Link Check ONLY on Travis Cron Jobs
+if [ "$TRAVIS_EVENT_TYPE" == "cron" ];
+then
+  if ! bundle exec ./scripts/htmlproofer.rb;
+  then
+    echo "Failed HTML link validation."
+    exit 1;
+  else
+    echo -e "\xE2\x9C\x94 No broken internal/external links!"
+    exit 0;
+  fi
 fi
 
-# 6. Run find-missing-slashes to find links that will redirect to okta.github.io
-fold npm_find_missing_slashes npm run find-missing-slashes
-
-# 7. Run htmlproofer to validate links, scripts, and images
-fold bundle_exec_htmlproofer bundle exec ./scripts/htmlproofer.rb
-
-# 8. Ensure that page fragments for quickstarts have not appeared in the sitemap
-
-if grep "quickstart/[^<]" dist/sitemap.xml; then
-  echo "Sitemap contains quickstart fragments, use sitemap.exclude=\"yes\" in your fragment metadata to exclude this fragment"
-  exit 1
-fi
+# Run /dist lint checker
+fold npm_post_build_lint npm run post-build-lint

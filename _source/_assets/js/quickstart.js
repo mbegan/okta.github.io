@@ -34,6 +34,11 @@
         serverExampleType: 'implicit'
       },
       {
+        name: 'vue',
+        label: 'Vue',
+        serverExampleType: 'implicit'
+      },
+      {
         name: 'android',
         label: 'Android',
         serverExampleType: 'implicit'
@@ -43,6 +48,12 @@
         label: 'iOS',
         serverExampleType: 'implicit'
       },
+      {
+        name: 'react-native',
+        label: 'React Native',
+        serverExampleType: 'implicit',
+        codeIconName: 'react' // Placeholder until React-Native has been added
+      }
     ],
     servers: [
       {
@@ -210,18 +221,24 @@
     var client = linkState.clients.filter(function (client) {
       return client.name === clientName;
     })[0];
-    var clientContentUrl = clientName + '/default-example.html';
-    var serverContentUrl = server + '/' + framework + '-' + client.serverExampleType + '.html';
+    var clientContentUrl = '/quickstart-fragments/' + clientName + '/default-example';
+    var serverContentUrl = '/quickstart-fragments/' + server + '/' + framework + '-' + client.serverExampleType;
 
     $.ajax({
       url: clientContentUrl
     }).done(function( html ) {
       $('#client_content').html(html);
+
+      // Re-run domain replacement now that content has changed. Defined in myOkta.js.
+      window.getMyOktaAccounts();
     });
     $.ajax({
       url: serverContentUrl
     }).done(function (html) {
       $('#server_content').html( html );
+
+      // Re-run domain replacement now that content has changed. Defined in myOkta.js.
+      window.getMyOktaAccounts();
 
       // Set the framework to active
       document.getElementById('framework-' + framework).setAttribute('class', 'active');
@@ -341,19 +358,27 @@
     applySelectionTupleToLinkSate(initialTuple);
     renderLinks();
     applySelectionTuple(initialTuple);
-    $('#client_setup_link').addClass('active');
+    $('#account_link').addClass('active');
   }
 
   // Used to scroll to the right place without anchors, 150 is to account for our header space
+  window.scrollToAccount = function () {
+    $('html, body').animate({scrollTop: $('#account').offset().top - 150});
+    $('#account_link').addClass('active');
+    $('#client_setup_link').removeClass('active');
+    $('#server_setup_link').removeClass('active');
+  };
   window.scrollToServer = function () {
     $('html, body').animate({scrollTop: $('#server_setup').offset().top - 150});
     $('#server_setup_link').addClass('active');
     $('#client_setup_link').removeClass('active');
+    $('#account_link').removeClass('active');
   };
   window.scrollToClient = function () {
     $('html, body').animate({scrollTop: $('#client_setup').offset().top - 150});
     $('#client_setup_link').addClass('active');
     $('#server_setup_link').removeClass('active');
+    $('#account_link').removeClass('active');
   };
 
   // Load the quickstart partials

@@ -1,7 +1,7 @@
 ---
 layout: docs_page
-weight: 2
-title: Authentication Reference
-link: /docs/api/resources/authn.html
-excerpt: Documentation describing how to use Okta APIs to authenticate users. Includes sample requests and responses.
+weight: 1
+title: Sign in Your Users
+link: /docs/api/resources/oidc.html
+excerpt: API endpoints to authenticate your users, challenge for factors, recover passwords, and more.
 ---

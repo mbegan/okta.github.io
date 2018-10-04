@@ -13,7 +13,9 @@ plugins:
   - jekyll-redirect-from
   - jekyll-paginate
   - jekyll-assets
-  - jekyll-redirect-from
+  - jekyll-include-cache
+  - jekyll-asciidoc
+  - asciidoctor-rouge
 
 source: _source
 destination: dist
@@ -33,7 +35,7 @@ github_edit_url: "https://github.com/okta/okta.github.io/edit/source/_source/"
 get_started_url: "https://developer.okta.com/signup/"
 stack_overflow_forum_url: "http://stackoverflow.com/search?q=okta"
 
-timezone: UTC
+timezone: EST
 ga_ua_id: "UA-15777010-3"
 
 # This is different from "url"
@@ -41,7 +43,6 @@ ga_ua_id: "UA-15777010-3"
 production_url: "https://developer.okta.com"
 
 include: [_static, .nojekyll, .woff, .tff]
-
 
 assets:
   compress:
@@ -65,31 +66,29 @@ collections:
     output: true
   code:
     output: true
-    permalink: /:collection/:path:output_ext
   use_cases:
     output: true
   authentication-guide:
     output: true
-    permalink: /:collection/:path:output_ext
   reference:
     output: true
   3rd_party_notices:
     output: true
   docs:
     output: true
-    permalink: /:collection/:path:output_ext
   quickstarts:
     output: true
+  change-log:
+    output: true
+    permalink: /docs/change-log/
+  sdk:
+    output: true
+    permalink: /docs/sdk/:path
 
 paginate: 10
 paginate_path: "/blog/page/:num"
 
 defaults:
-  -
-    scope:
-      collection: slides
-    values:
-      layout: documentation
   -
     scope:
       collection: code
@@ -100,14 +99,30 @@ defaults:
       collection: reference
     values:
       layout: documentation
+  -
+    scope:
+      collection: docs
+    values:
+      toc: true
+  - 
+    scope:
+      collection: use_cases
+    values:
+      hidden: false
+
+sitemap_ignore:
+  - sdk
+  - change-log
+  - quickstart-fragments
+  - 3rd_party_notices
+  # Omit from sitemap.collection traversal
+  - posts
 
 # Okta Library versions
 versions:
   jwt_validator_java: 0.2.0
-  spring_boot_starter: 0.2.0
-  okta_signin_widget: 2.1.0
-
-signup_error_email_address: "BD-ISV@okta.com"
+  spring_boot_starter: 0.5.0
+  okta_signin_widget: 2.6.0
 
 # Bug: 37458
 # Add Discourse link
@@ -116,3 +131,15 @@ dev_forum:  https://devforum.okta.com/
 
 # Location of main Drupal site for navigation and shared resources
 external_domain: https://developer.okta.com
+
+# Link for telling people to contact support
+
+contact_support_lc: contact <a href="https://support.okta.com/help/open_case" target="_blank">Support</a>
+contact_support_uc: Contact <a href="https://support.okta.com/help/open_case" target="_blank">Support</a>
+
+# AsciiDoc settings - only applies to blog. Can be removed when we move to Hugo for the blog.
+asciidoctor:
+  attributes:
+    source-highlighter: rouge
+    icons: font
+  base_dir: :_source

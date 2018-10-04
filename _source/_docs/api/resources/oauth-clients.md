@@ -1,7 +1,9 @@
 ---
 layout: docs_page
 title: Dynamic Client Registration
+category: management
 redirect_from: "/docs/api/rest/oauth-clients.html"
+excerpt: Operations to register and manage client applications for use with Okta's OAuth 2.0 and OpenID Connect endpoints
 ---
 
 # Dynamic Client Registration API
@@ -11,45 +13,35 @@ OAuth 2.0 and OpenID Connect endpoints. This API largely follows the contract de
 and [OpenID Connect Dynamic Client Registration 1.0](https://openid.net/specs/openid-connect-registration-1_0.html).
 
 Note that clients managed via this API are modeled as applications in Okta and appear in the Applications section of the
-Administrator dashboard. Changes made via the API appear in the UI and vice versa. Tokens issued by these clients
+administrator UI. Changes made via the API appear in the UI and vice versa. Tokens issued by these clients
 follow the rules for Access Tokens and ID Tokens.
-
-> This API is an {% api_lifecycle ea%} feature.
-
-Explore the Client Registration API: [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/291ba43cde74844dd4a7){:target="_blank"}
 
 ## Getting Started
 
-If you are new to OAuth 2.0 or OpenID Connect, read this topic before experimenting with the Postman collection. If you are familiar with the
-flows defined by [the OAuth 2.0 spec](http://oauth.net/documentation) or [OpenID Connect spec](http://openid.net/specs/openid-connect-core-1_0.html), you may want to experiment with the Postman collection first:
-
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/291ba43cde74844dd4a7)
-
+Explore the Client Application API: [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/291ba43cde74844dd4a7)
 
 ## Client Application Operations
-
-Explore the Client Application API: [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/7a7f9956c58e49996dc8)
 
 ### Register New Client
 {:.api .api-operation}
 
 {% api_operation post /oauth2/v1/clients %}
 
-Adds a new client application to your organization.
+Adds a new client application to your organization
 
 ##### Request Parameters
 {:.api .api-request .api-request-params}
 
 | Parameter | Description                        | ParamType | DataType                                      | Required |
 |:----------|:-----------------------------------|:----------|:----------------------------------------------|:---------|
-| settings  | OAuth client registration settings | Body      |   [Client Settings](#client-application-model)  | TRUE     |
+| settings  | OAuth client registration settings | Body      | [Client Settings](#client-application-model)  | TRUE     |
 
 ##### Response Parameters
 {:.api .api-response .api-response-params}
 
-The created [OAuth Client](#client-application-model).
+The [OAuth Client](#client-application-model) created by the request
 
-> {% api_lifecycle beta %} Note: Apps created on `/api/v1/apps` default to `consent_method=TRUSTED`, while those created on `/api/v1/clients` default to `consent_method=REQUIRED`.
+> {% api_lifecycle ea %} Note: Apps created on `/api/v1/apps` default to `consent_method=TRUSTED`, while those created on `/api/v1/clients` default to `consent_method=REQUIRED`.
 
 ##### Request Example
 {:.api .api-request .api-request-example}
@@ -80,7 +72,7 @@ curl -v -X POST \
       ],
       "token_endpoint_auth_method": "client_secret_post",
       "initiate_login_uri": "https://www.example-application.com/oauth2/login"
-    }' "https://{yourOktaDomain}.com/oauth2/v1/clients"
+    }' "https://{yourOktaDomain}/oauth2/v1/clients"
 ~~~
 
 ##### Response Example
@@ -118,24 +110,179 @@ Content-Type: application/json;charset=UTF-8
 }
 ~~~
 
-### Get OAuth Client
+##### Response Example: Duplicate Client Name
+{:.api .api-response .api-response-example}
+
+~~~http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+~~~
+~~~json
+{
+    "error": "invalid_client_metadata",
+    "error_description": "client_name: An object with this field already exists in the current organization"
+}
+~~~
+
+### List Client Applications
 {:.api .api-operation}
 
-{% api_operation get /oauth2/v1/clients/*:clientId* %}
+{% api_operation get /oauth2/v1/clients %}
 
-Fetches a specific client by `clientId` from your organization
+Lists all the client applications in your organization (with optional pagination)
 
 ##### Request Parameters
 {:.api .api-request .api-request-params}
 
-| Parameter | Description                      | ParamType | DataType | Required |
-|:----------|:---------------------------------|:----------|:---------|:---------|
-| client_id | `client_id` of a specific client | URL       | String   | TRUE     |
+Parameter | Description                                                                                | ParamType | DataType | Required | Default | Maximum |
+--------- | ------------------------------------------------------------------------------------------ | --------- | -------- | -------- | -------
+q         | Searches the `client_name` property of clients for matching value                          | Query     | String   | FALSE    |
+limit     | Specifies the number of client results in a page                                           | Query     | Number   | FALSE    | 20  | 200 |
+after     | Specifies the pagination cursor for the next page of clients                               | Query     | String   | FALSE    |
+
+>Note:
+*  The `after` cursor should treated as an opaque value and obtained through [the next link relation](/docs/api/getting_started/design_principles#pagination).
+* Search currently performs a startsWith match but this is an implementation detail and may change without notice in the future.
 
 ##### Response Parameters
 {:.api .api-response .api-response-params}
 
-Fetched [OAuth Client](#client-application-model).
+Array of [OAuth Clients](#client-application-model)
+
+##### Request Example: List All Clients
+{:.api .api-request .api-request-example}
+
+~~~sh
+curl -v -X GET \
+-H "Accept: application/json" \
+-H "Content-Type: application/json" \
+-H "Authorization: SSWS ${api_token}" \
+"https://{yourOktaDomain}/oauth2/v1/clients"
+~~~
+
+##### Response Example
+{:.api .api-response .api-response-example}
+
+~~~http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+~~~
+Header links for pagination:
+
+~~~http
+<https://{yourOktaDomain}/oauth2/v1/clients?limit=20>; rel="self"
+<https://{yourOktaDomain}/oauth2/v1/clients?after=xfnIflwIn2TkbpNBs6JQ&limit=20>; rel="next"
+~~~
+
+Response body:
+
+~~~json
+[
+    {
+        "client_id": "B6YnDUIpt6Oq354YYaNR",
+        "client_id_issued_at": 1495059435,
+        "client_secret_expires_at": 0,
+        "client_name": "Native client",
+        "client_uri": null,
+        "logo_uri": null,
+        "redirect_uris": [
+            "https://httpbin.org/get"
+        ],
+        "response_types": [
+            "id_token",
+            "code",
+            "token"
+        ],
+        "grant_types": [
+            "password",
+            "refresh_token",
+            "authorization_code",
+            "implicit"
+        ],
+        "token_endpoint_auth_method": "client_secret_basic",
+        "application_type": "native"
+    },
+    {
+        "client_id": "etwquEhEjxqyA7HDB8lD",
+        "client_id_issued_at": 1495059868,
+        "client_secret_expires_at": 0,
+        "client_name": "Service client",
+        "client_uri": null,
+        "logo_uri": null,
+        "redirect_uris": [],
+        "response_types": [
+            "token"
+        ],
+        "grant_types": [
+            "client_credentials"
+        ],
+        "token_endpoint_auth_method": "client_secret_basic",
+        "application_type": "service"
+    },
+    {
+        "client_id": "l3O8MfR0eTVfLJ7jG2UB",
+        "client_id_issued_at": 1495059734,
+        "client_name": "Browser client",
+        "client_uri": null,
+        "logo_uri": null,
+        "redirect_uris": [
+            "https://httpbin.org/get"
+        ],
+        "response_types": [
+            "id_token",
+            "token"
+        ],
+        "grant_types": [
+            "implicit"
+        ],
+        "token_endpoint_auth_method": "none",
+        "application_type": "browser"
+    },
+    {
+        "client_id": "rHQoApjizqc4MGVlW5En",
+        "client_id_issued_at": 1495059117,
+        "client_secret_expires_at": 0,
+        "client_name": "Web client",
+        "client_uri": null,
+        "logo_uri": null,
+        "redirect_uris": [
+          "https://www.example-application.com/oauth2/redirectUri"
+        ],
+        "response_types": [
+            "code",
+            "id_token",
+            "token"
+        ],
+        "grant_types": [
+            "authorization_code",
+            "refresh_token",
+            "implicit"
+        ],
+        "token_endpoint_auth_method": "client_secret_basic",
+        "application_type": "web"
+    }
+]
+~~~
+
+### List Client Applications Matching a Search Filter
+{:.api .api-operation}
+
+{% api_operation get /oauth2/v1/clients?q=${term} %}
+
+Lists all clients that match a search filter on `client_name`
+
+##### Request Parameters
+{:.api .api-request .api-request-params}
+
+Parameter | Description                                                                                | ParamType | DataType | Required | Default | Maximum |
+--------- | ------------------------------------------------------------------------------------------ | --------- | -------- | -------- | -------
+q         | Searches the `client_name` property of clients for matching value                          | Query     | String   | FALSE    |
+limit     | Specifies the number of client results in a page                                           | Query     | Number   | FALSE    | 20  | 200 |
+after     | Specifies the pagination cursor for the next page of clients                               | Query     | String   | FALSE    |
+
+>Note:
+*  The `after` cursor should treated as an opaque value and obtained through [the next link relation](/docs/api/getting_started/design_principles#pagination).
+* Search currently performs a startsWith match but this is an implementation detail and may change without notice in the future.
 
 ##### Request Example
 {:.api .api-request .api-request-example}
@@ -145,7 +292,81 @@ curl -v -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY"
+"https://{yourOktaDomain}/oauth2/v1/clients?q=web&limit=1"
+~~~
+
+##### Response Example
+{:.api .api-request .api-response-example}
+
+~~~http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+~~~
+Header links for pagination:
+
+~~~http
+<https://{yourOktaDomain}/oauth2/v1/clients?limit=20>; rel="self"
+<https://{yourOktaDomain}/oauth2/v1/clients?after=xfnIflwIn2TkbpNBs6JQ&limit=1>; rel="next"
+~~~
+
+Response body:
+
+~~~json
+[
+    {
+        "client_id": "rHQoApjizqc4MGVlW5En",
+        "client_id_issued_at": 1495059117,
+        "client_secret_expires_at": 0,
+        "client_name": "Web client",
+        "client_uri": null,
+        "logo_uri": null,
+        "redirect_uris": [
+            "https://httpbin.org/get"
+        ],
+        "response_types": [
+            "code",
+            "id_token",
+            "token"
+        ],
+        "grant_types": [
+            "authorization_code",
+            "refresh_token",
+            "implicit"
+        ],
+        "token_endpoint_auth_method": "client_secret_basic",
+        "application_type": "web"
+    }
+]
+~~~
+
+### Get OAuth Client
+{:.api .api-operation}
+
+{% api_operation get /oauth2/v1/clients/${clientId} %}
+
+Fetches a specific client by `clientId` from your organization
+
+##### Request Parameters
+{:.api .api-request .api-request-params}
+
+| Parameter | Description                      | ParamType | DataType | Required |
+|:----------|:---------------------------------|:----------|:---------|:---------|
+| clientId| `client_id` of a specific client | URL       | String   | TRUE     |
+
+##### Response Parameters
+{:.api .api-response .api-response-params}
+
+The requested [OAuth Client](#client-application-model)
+
+##### Request Example
+{:.api .api-request .api-request-example}
+
+~~~sh
+curl -v -X GET \
+-H "Accept: application/json" \
+-H "Content-Type: application/json" \
+-H "Authorization: SSWS ${api_token}" \
+"https://{yourOktaDomain}/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY"
 ~~~
 
 ##### Response Example
@@ -181,165 +402,25 @@ Content-Type: application/json;charset=UTF-8
 }
 ~~~
 
-### List Client Applications
-{:.api .api-operation}
-
-{% api_operation get /oauth2/v1/clients %}
-
-Enumerates client applications in your organization (with pagination).
-
-##### Request Parameters
-{:.api .api-request .api-request-params}
-
-Parameter | Description                                                                                | ParamType | DataType | Required | Default
---------- | ------------------------------------------------------------------------------------------ | --------- | -------- | -------- | -------
-q         | Searches the `client_name` property of clients for matching value                          | Query     | String   | FALSE    |
-limit     | Specifies the number of client results in a page                                           | Query     | Number   | FALSE    | 200
-after     | Specifies the pagination cursor for the next page of clients                               | Query     | String   | FALSE    |
-
-> The `after` cursor should treated as an opaque value and obtained through the next link relation. See [Pagination](/docs/api/getting_started/design_principles.html#pagination)
-
-> Search currently performs a startsWith match but it should be considered an implementation detail and may change without notice in the future.
-
-##### Response Parameters
-{:.api .api-response .api-response-params}
-
-Array of [OAuth Clients](#client-application-model)
-
-#### List Client Apps with Defaults
-{:.api .api-operation}
-
-Enumerates all client applications in your organization.
-
-##### Request Example
-{:.api .api-request .api-request-example}
-
-~~~sh
-curl -v -X GET \
--H "Accept: application/json" \
--H "Content-Type: application/json" \
--H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/oauth2/v1/clients"
-~~~
-
-##### Response Example
+##### Response Example: Incorrect `client_id`
 {:.api .api-response .api-response-example}
 
 ~~~http
-HTTP/1.1 200 OK
+HTTP/1.1 401 Unauthorized
 Content-Type: application/json
 ~~~
+
 ~~~json
-Link: <https://{yourOktaDomain}.com/oauth2/v1/clients>; rel="self"
-Link: <https://{yourOktaDomain}.com/oauth2/v1/clients?after=F10CaazJPQ5Zpyu1Ojko>; rel="next"
-
-[
-  {
-    "client_id": "0jrabyQWm4B9zVJPbotY",
-    "client_id_issued_at": 1453913425,
-    "client_name": "Example OAuth Client",
-    "client_uri": "https://www.example-application.com",
-    "logo_uri": "https://www.example-application.com/logo.png",
-    "application_type": "web",
-    "redirect_uris": [
-      "https://www.example-application.com/oauth2/redirectUri"
-    ],
-    "post_logout_redirect_uris": [
-      "https://www.example-application.com/oauth2/postLogoutRedirectUri"
-    ],
-    "response_types": [
-      "id_token",
-      "code"
-    ],
-    "grant_types": [
-      "authorization_code"
-    ],
-    "token_endpoint_auth_method": "client_secret_post",
-    "initiate_login_uri": "https://www.example-application.com/oauth2/login"
-  },
-  {
-    "client_id": "F10CaazJPQ5Zpyu1Ojko",
-    "client_id_issued_at": 1453913425,
-    "client_name": "Another OAuth Client",
-    "client_uri": "https://www.another-application.com",
-    "logo_uri": "https://www.another-application.com/logo.png",
-    "application_type": "browser",
-    "redirect_uris": [
-      "https://www.another-application.com/oauth2/redirectUri"
-    ],
-    "post_logout_redirect_uris": [
-      "https://www.example-application.com/oauth2/postLogoutRedirectUri"
-    ],
-    "response_types": [
-      "id_token",
-      "token"
-    ],
-    "grant_types": [
-      "implicit"
-    ],
-    "token_endpoint_auth_method": "none",
-    "initiate_login_uri": null
-  }
-]
-~~~
-
-#### Search Client Applications
-{:.api .api-operation}
-
-Searches for clients by `client_name` in your organization.
-
-> Search currently performs a startsWith match but it should be considered an implementation detail and may change without notice in the future. Exact matches will always be returned before partial matches.
-
-##### Request Example
-{:.api .api-request .api-request-example}
-
-~~~sh
-curl -v -X GET \
--H "Accept: application/json" \
--H "Content-Type: application/json" \
--H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/oauth2/v1/clients?q=Payroll&limit=10"
-~~~
-
-##### Response Example
-{:.api .api-response .api-response-example}
-
-~~~http
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-~~~
-~~~json
-[
-  {
-    "client_id": "JoLxQvMz6u0kEkHFSnC8",
-    "client_id_issued_at": 1453913425,
-    "client_name": "Payroll Application",
-    "client_uri": "https://www.payroll-application.com",
-    "logo_uri": "https://www.payroll-application.com/logo.png",
-    "application_type": "web",
-    "redirect_uris": [
-      "https://www.payroll-application.com/oauth2/redirectUri"
-    ],
-    "post_logout_redirect_uris": [
-      "https://www.example-application.com/oauth2/postLogoutRedirectUri"
-    ],
-    "response_types": [
-      "id_token",
-      "code"
-    ],
-    "grant_types": [
-      "authorization_code"
-    ],
-    "token_endpoint_auth_method": "client_secret_post",
-    "initiate_login_uri": "https://www.example-application.com/oauth2/login"
-  }
-]
+{
+    "error": "invalid_client",
+    "error_description": "Invalid value for 'client_id' parameter."
+}
 ~~~
 
 ### Update Client Application
 {:.api .api-operation}
 
-{% api_operation put /oauth2/v1/clients/*:clientId* %}
+{% api_operation put /oauth2/v1/clients/${clientId} %}
 
 Updates the settings for a client application from your organization.
 
@@ -348,10 +429,10 @@ Updates the settings for a client application from your organization.
 
 Parameter | Description                        | ParamType | DataType                               | Required |
 --------- | ---------------------------------- | --------- | -------------------------------------- | -------- |
-client_id  | `client_id` of a specific client    | URL       | String                                 | TRUE     |
+clientId | `client_id` of a specific client    | URL       | String                                 | TRUE     |
 settings  | OAuth client registration settings | Body      | [Client Settings](#client-application-model) | TRUE     |
 
-> All settings must be specified when updating a client application, **partial updates are not supported!** If any settings are missing when updating a client application the update will fail. The exceptions are: `client_secret_expires_at`, or `client_id_issued_at` must not be included in the request, and the `client_secret` can be omitted.
+> All settings must be specified when updating a client application, **partial updates are not supported.** If any settings are missing when updating a client application the update fails. The exceptions are: `client_secret_expires_at`, or `client_id_issued_at` must not be included in the request, and the `client_secret` can be omitted.
 
 ##### Response Parameters
 {:.api .api-response .api-response-params}
@@ -387,7 +468,89 @@ curl -v -X PUT \
       ],
       "token_endpoint_auth_method": "client_secret_post",
       "initiate_login_uri": "https://www.example-application.com/oauth2/login"
-    }' "https://{yourOktaDomain}.com/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY"
+    }' "https://{yourOktaDomain}/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY"
+~~~
+
+##### Response Example
+{:.api .api-response .api-response-example}
+
+~~~http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+~~~
+
+~~~json
+{
+  "client_id": "0jrabyQWm4B9zVJPbotY",
+  "client_secret": "5W7XULCEs4BJKnWUXwh8lgmeXRhcGcdViFp84pWe",
+  "client_id_issued_at": 1453913425,
+  "client_secret_expires_at": 0,
+  "client_name": "Updated OAuth Client",
+  "client_uri": "https://www.example-application.com",
+  "logo_uri": "https://www.example-application.com/logo.png",
+  "application_type": "web",
+  "redirect_uris": [
+    "https://www.example-application.com/oauth2/redirectUri"
+  ],
+  "post_logout_redirect_uris": [
+    "https://www.example-application.com/oauth2/postLogoutRedirectUri"
+  ],
+  "response_types": [
+    "id_token",
+    "code"
+  ],
+  "grant_types": [
+    "authorization_code"
+  ],
+  "token_endpoint_auth_method": "client_secret_post",
+  "initiate_login_uri": "https://www.example-application.com/oauth2/login"
+}
+~~~
+##### Response Example: Missing Required Setting `client_name`
+{:.api .api-response .api-response-example}
+
+~~~http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json;charset=UTF-8
+~~~
+
+~~~json
+{
+    "error": "invalid_client_metadata",
+    "error_description": "client_name: The field cannot be left blank"
+}
+~~~
+
+### Generate New Client Secret
+{:.api .api-operation}
+
+{% api_operation put /oauth2/v1/clients/${clientId}/lifecycle/newSecret %}
+
+Generates a new client secret for the specified client application.
+
+##### Request Parameters
+{:.api .api-request .api-request-params}
+
+Parameter | Description                        | ParamType | DataType                               | Required |
+--------- | ---------------------------------- | --------- | -------------------------------------- | -------- |
+clientId | `client_id` of a specific client    | URL       | String                                 | TRUE     |
+
+> This operation only applies to client applications which use the `client_secret_post` or `client_secret_basic` method for token endpoint authorization.
+
+##### Response Parameters
+{:.api .api-response .api-response-params}
+
+Updated [OAuth Client](#client-application-model) with client_secret shown.
+
+##### Request Example
+{:.api .api-request .api-request-example}
+
+~~~sh
+curl -v -X POST \
+-H "Accept: application/json" \
+-H "Content-Type: application/json" \
+-H "Authorization: SSWS ${api_token}" \
+ "https://{yourOktaDomain}/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY/lifecycle/newSecret"
 ~~~
 
 ##### Response Example
@@ -425,78 +588,28 @@ Content-Type: application/json;charset=UTF-8
 }
 ~~~
 
-### Generate new client secret
-{:.api .api-operation}
-
-{% api_operation put /oauth2/v1/clients/*:client_id*/lifecycle/newSecret %}
-
-Generates a new client secret for the specified client application.
-
-##### Request Parameters
-{:.api .api-request .api-request-params}
-
-Parameter | Description                        | ParamType | DataType                               | Required |
---------- | ---------------------------------- | --------- | -------------------------------------- | -------- |
-client_id  | `client_id` of a specific client    | URL       | String                                 | TRUE     |
-
-> This operation only applies to client applications which use the `client_secret_post` or `client_secret_basic` method for token endpoint authorization.
-
-##### Response Parameters
-{:.api .api-response .api-response-params}
-
-Updated [OAuth Client](#client-application-model) with client_secret shown.
-
-##### Request Example
-{:.api .api-request .api-request-example}
-
-~~~sh
-curl -v -X POST \
--H "Accept: application/json" \
--H "Content-Type: application/json" \
--H "Authorization: SSWS ${api_token}" \
- "https://{yourOktaDomain}.com/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY/lifecycle/newSecret"
-~~~
-
-##### Response Example
+##### Response Example: Incorrect `client_id`
 {:.api .api-response .api-response-example}
 
 ~~~http
-HTTP/1.1 200 OK
+HTTP/1.1 404 Not Found
 Content-Type: application/json;charset=UTF-8
 ~~~
+
 ~~~json
 {
-  "client_id": "0jrabyQWm4B9zVJPbotY",
-  "client_secret": "t1hgVNl06UiMTzlsVVj0UywSDDuNdG529lm0bpy8",
-  "client_id_issued_at": 1453913425,
-  "client_secret_expires_at": 0,
-  "client_name": "Updated OAuth Client",
-  "client_uri": "https://www.example-application.com",
-  "client_secret": "cdUQIFvE61wGI5P51H33ORC4SRB1RXfX",
-  "logo_uri": "https://www.example-application.com/logo.png",
-  "application_type": "web",
-  "redirect_uris": [
-    "https://www.example-application.com/oauth2/redirectUri"
-  ],
-  "post_logout_redirect_uris": [
-    "https://www.example-application.com/oauth2/postLogoutRedirectUri"
-  ],
-  "response_types": [
-    "id_token",
-    "code"
-  ],
-  "grant_types": [
-    "authorization_code"
-  ],
-  "token_endpoint_auth_method": "client_secret_post",
-  "initiate_login_uri": "https://www.example-application.com/oauth2/login"
+    "errorCode": "E0000007",
+    "errorSummary": "Not found: Resource not found: 0jrubyXXm4B9zVJPboyT (PublicClientApp)",
+    "errorLink": "E0000007",
+    "errorId": "oae7LrklqzDQCmZSkcOgdImDg",
+    "errorCauses": []
 }
 ~~~
 
 ### Remove Client Application
 {:.api .api-operation}
 
-{% api_operation delete /oauth2/v1/clients/*:client_id* %}
+{% api_operation delete /oauth2/v1/clients/${clientId} %}
 
 Removes a client application from your organization.
 
@@ -505,7 +618,7 @@ Removes a client application from your organization.
 
 | Parameter | Description                      | ParamType | DataType | Required |
 |:----------|:---------------------------------|:----------|:---------|:---------|
-| client_id | `client_id` of a specific client | URL       | String   | TRUE     |
+| clientId| `client_id` of a specific client | URL       | String   | TRUE     |
 
 ##### Response Parameters
 {:.api .api-response .api-response-params}
@@ -520,7 +633,7 @@ curl -v -X DELETE \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY"
+"https://{yourOktaDomain}/oauth2/v1/clients/0jrabyQWm4B9zVJPbotY"
 ~~~
 
 
@@ -529,6 +642,21 @@ curl -v -X DELETE \
 
 ~~~http
 HTTP/1.1 204 No Content
+~~~
+
+##### Response Example: Incorrect `client_id`
+{:.api .api-response .api-response-example}
+
+~~~http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json;charset=UTF-8
+~~~
+
+~~~json
+{
+    "error": "invalid_client",
+    "error_description": "Invalid value for 'client_id' parameter."
+}
 ~~~
 
 ## Client Application Model
@@ -584,8 +712,10 @@ Client applications have the following properties:
 | grant_types                         | Array of OAuth 2.0 grant type strings. Default value: `authorization_code`                                                 | Array of `authorization_code`, `implicit`, `password`, `refresh_token`, `client_credentials` | TRUE     | FALSE  | FALSE     |
 | token_endpoint_auth_method          | requested authentication method for the token endpoint. Default value: `client_secret_basic`                               | `none`, `client_secret_post`, `client_secret_basic`, or `client_secret_jwt`                  | TRUE     | FALSE  | FALSE     |
 | initiate_login_uri                  | URL that a third party can use to initiate a login by the client                                                           | String                                                                                       | TRUE     | FALSE  | FALSE     |
-| tos_uri {% api_lifecycle beta %}    | URL string of a web page providing the client's terms of service document                                                                                         | URL                                                                                          | TRUE     | FALSE  | FALSE     |
-| policy_uri {% api_lifecycle beta %} | URL string of a web page providing the client's policy document                                                                                                   | URL                                                                                          | TRUE     | FALSE  | FALSE     |
+| jwks                                | A [JSON Web Key Set](https://tools.ietf.org/html/rfc7517#section-5) for validating JWTs presented to Okta.                 | [JSON Web Key Set](#json-web-key-set)                                                        | TRUE     | FALSE  | FALSE     |
+| tos_uri {% api_lifecycle ea %}    | URL string of a web page providing the client's terms of service document                                                                                         | URL                                                                                          | TRUE     | FALSE  | FALSE     |
+| policy_uri {% api_lifecycle ea %} | URL string of a web page providing the client's policy document                                                                                                   | URL                                                                                          | TRUE     | FALSE  | FALSE     |
+
 
 Property Details
 
@@ -620,3 +750,26 @@ Property Details
     value that includes `authorization_code` implies a `response_types` value that includes `code`, as both values are defined as part of
     the OAuth 2.0 authorization code grant.
 
+## JSON Web Key Set
+
+The JSON Web Key Set (`jwks`) is a set of public keys registered for the client to use for client authentication.
+
+The `jwks` object has precisely one attribute: `keys`, which is an array of JSON Web Key.
+
+| Property   | DataType                      | Nullable | Unique | Readonly  |
+|------------|:----------------------------- |:-------- |:------ |:--------- |
+| keys       | An array of JSON Web Keys     | TRUE     | FALSE  | FALSE     |
+
+## JSON Web Key
+
+A [JSON Web Key (JWK)](https://tools.ietf.org/html/rfc7517) is a JSON representation of a cryptographic key. Okta can use these keys to verify the signature of a JWT when provided for the `private_key_jwt` client authentication method, or for a signed authorize request object.
+Okta supports both RSA and Elliptic Curve (EC) keys.
+
+| Property   | Description                                          | DataType      | Nullable                              | Unique                | Readonly  |
+|------------|:---------------------------------------------------- |:------------- |:------------------------------------- |:--------------------- |:--------- |
+| kty        | The type of public key this is                       | `RSA` or `EC` | FALSE                                 | FALSE                 | FALSE     |
+| kid        | The unique identifier of the key                     | String        | TRUE, if only one key in the JWKS     | TRUE, within the JWKS | FALSE     |
+| e          | The key exponent of a RSA key                        | String        | TRUE, unless the kty is `RSA`         | FALSE                 | FALSE     |
+| n          | The modulus of a RSA key                             | String        | TRUE, unless the kty is `RSA`         | FALSE                 | FALSE     |
+| x          | The public x coordinate for the elliptic curve point | String        | TRUE, unless the kty is `EC`          | FALSE                 | FALSE     |
+| y          | The public y coordinate for the elliptic curve point | String        | TRUE, unless the kty is `EC`          | FALSE                 | FALSE     |

@@ -19,7 +19,7 @@ and 2fa</p>&mdash; Chris Rohlf (@chrisrohlf) March 8, 2015
 </blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-In this guide, we’ll show you how to add multi-factor authentication
+In this guide, we'll show you how to add multi-factor authentication
 to your app with Okta.
 
 Okta gives you the flexibility to deploy our built-in
@@ -27,7 +27,7 @@ factors, or integrate with existing tokens. Native factors include
 SMS, and the Okta Verify app for iOS and Android. Integrations include
 Google Authenticator, RSA SecurID, Symantec VIP, and Duo Security.
 
-Let’s get started!
+Let's get started!
 
 <iframe src="https://player.vimeo.com/video/123445568" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 
@@ -36,13 +36,13 @@ Let’s get started!
 To follow along with this guide, you will need to have your own Okta Developer Edition org and have Postman configured to make API requests to that account.
 
 1.  Creating your Okta Developer Edition org
-    If you don’t already have one, create your own Okta Developer
+    If you don't already have one, create your own Okta Developer
     Edition org by visiting: <https://developer.okta.com/signup/>
     and following the instructions.
 2.  Setting up the Postman API client
     After you have logged in to your account in your Okta Developer
     Edition org, follow the
-    [instructions on the Okta Developer Documentation page for setting up Postman](/docs/getting_started/api_test_client.html).
+    [instructions on the Okta Developer Documentation page for setting up Postman](/code/rest/).
 
 # Overview of API calls used for multi-factor authentication
 
@@ -54,17 +54,17 @@ involved in adding MFA to your
 application. How use actually make these calls will depend on the
 programming language and web framework that your application uses.
 
-If you are writing code in .NET or Java, [Okta has helper libraries](/code/index.html)
+If you are writing code in .NET or Java, [Okta has helper libraries](/code/)
 that will make it easy to add support for Okta to your application
 in an idiomatic way.
 
 ### Setting up your Okta org for MFA
 
 Before you can start writing code, you'll need to make do a few
-things in the Admin interface to your Okta org.
+things in the administrator UI to your Okta org.
 
 1.  Enable support for MFA.
-2.  [Create an API token](/docs/api/getting_started/getting_a_token.html).
+2.  [Create an API token](/docs/api/getting_started/getting_a_token).
 
 ### Enabling MFA in your Okta org
 
@@ -74,7 +74,7 @@ Okta API. Here is how to enable MFA for
 your Okta org:
 
 1.  Log in to your Okta org as a user with administration.
-2.  Click the "Admin" button to get into the Admin interface.
+2.  Click the "Admin" button to get into the administrator interface.
 3.  Open the "Security" menu.
 4.  Select "Authentication" from the menu.
 5.  Click on "Multifactor".
@@ -89,12 +89,12 @@ For more information about MFA and the Okta org, see the [MFA](https://help.okta
 
 Requests made to the Okta API are authenticated via an API
 token. [Here is how to create an API token for your Okta
-org](/docs/api/getting_started/getting_a_token.html).
+org](/docs/api/getting_started/getting_a_token).
 
 ### Set up Postman
 
 If you haven't set up Postman already, you will need to do that
-now. Here are [instructions for setting up Postman to work with Okta](/docs/getting_started/api_test_client.html).
+now. Here are [instructions for setting up Postman to work with Okta](/code/rest/).
 
 ### Test Postman
 
@@ -223,6 +223,6 @@ Okta MFA API with the following resources.
 
 -   The video in this guide.
     These instructions only cover part of what is covered in the video.
--   The [design principles for the Okta API](/docs/getting_started/design_principles.html).
--   The API documentation for the [Okta Factors API](/docs/api/resources/factors.html).
--   The API documentation for the [Okta Authentication API](/docs/api/resources/authn.html).
+-   The [design principles for the Okta API](/docs/getting_started/design_principles).
+-   The API documentation for the [Okta Factors API](/docs/api/resources/factors).
+-   The API documentation for the [Okta Authentication API](/docs/api/resources/authn).

@@ -13,7 +13,7 @@ Authentication is a crucial part of any application development.  Whether you ar
 
 The login experience is perhaps the single most important user experience any app developer needs to consider. To provide a seamless, attractive, yet secure authentication experience is not a trivial task. And typically, the login logic goes hand in hand with other features such as password reset and registration. More importantly, enhanced security in the form of strong and adaptive authentication during login is often critical to many implementations.
 
-Okta provides many options for developers around the authentication experience. The foundation is built on top of the underlying feature set in Okta. Password policies, strong and adaptive authentication policies, password reset workflow, and more can all be configured easily in the Okta Admin console. Many of these policies can also be controlled through Okta’s API.
+Okta provides many options for developers around the authentication experience. The foundation is built on top of the underlying feature set in Okta. Password policies, strong and adaptive authentication policies, password reset workflow, and more can all be configured easily in the administrator UI. Many of these policies can also be controlled through Okta's API.
 
 Okta provides the OAuth 2.0 and OpenID Connect implementations, the Authentication API, the Sign-in Widget, and the Auth JS SDK:
 
@@ -30,7 +30,7 @@ To find out more about Okta's OAuth 2.0 and OpenID Connect implementations, as w
 
 ### Sign-In Widget
 
-The [Okta Sign-in Widget](/code/javascript/okta_sign-in_widget.html)
+The [Okta Sign-in Widget](/code/javascript/okta_sign-in_widget)
 provides an embeddable Javascript sign-in implementation that can
 easily be embedded into your customized login page.  The Sign-in
 widget carries the same feature set in the standard Okta sign-in page
@@ -56,10 +56,10 @@ and authorization needs.
 ### Authentication API
 
 The underlying foundation for the Sign-In Widget and Auth SDK is a
-comprehensive [authentication REST API](/docs/api/resources/authn.html)
+comprehensive [authentication REST API](/docs/api/resources/authn)
 exposed through Okta.  Use it as a
 standalone API to provide the identity layer on top of your existing
-application and authentication logic, or use it with the Okta [Sessions API](/docs/api/resources/sessions.html)
+application and authentication logic, or use it with the Okta [Sessions API](/docs/api/resources/sessions)
 to obtain an Okta [session cookie](/use_cases/authentication/session_cookie) and access apps within Okta.
 This session integration provides an SSO experience across custom and Okta-managed apps.
 
@@ -70,7 +70,7 @@ provides several options for secure SSO.  SAML has been
 widely used as the single sign-on protocol by many ISVs and is
 supported by many identity management solutions.  Okta provides
 comprehensive guidance for developers to implement a proper
-[SAML service provider](/docs/guides/saml_guidance.html).
+[SAML service provider](/docs/guides/saml_guidance).
 For IT building internal apps and would like to support SSO, SAML is
 also a good option.
 
@@ -78,7 +78,7 @@ OpenID Connect is the emerging technology that provides an alternative implement
 Okta is a [Certified OpenID Connect provider](http://openid.net/certification/).
 Building on top of OAuth 2.0 framework, OpenID Connect is a modern
 implementation to support authentication and SSO.  If you
-are an Okta customer, our [OpenID Connect API](/docs/api/resources/oidc.html) is a great way to support SSO and
+are an Okta customer, our [OpenID Connect API](/docs/api/resources/oidc) is a great way to support SSO and
 is a simpler alternative to SAML.
 
 For ISVs who want to provide SSO for their customers, both

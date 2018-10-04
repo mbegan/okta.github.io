@@ -3,9 +3,9 @@
 ###############################################################################
 # LINT
 ###############################################################################
+export GENERATED_SITE_LOCATION="dist"
 
 function url_consistency_check() {
-    interject "Checking ${GENERATED_SITE_LOCATION} to make sure documentation uses proper prefixes ('/api/v1', '/oauth2', etc) in example URLs"
     if [ ! -d "$GENERATED_SITE_LOCATION" ]; then
        echo "Directory ${GENERATED_SITE_LOCATION} not found";
        return 1;
@@ -17,7 +17,7 @@ function url_consistency_check() {
         # 'grep' all found files for 'api-uri-template', printing line numbers on output
         xargs grep -n api-uri-template | \
         # Search for the 'api/v' string, so we match "api/v1", "api/v2", etc
-        grep -v api/v | grep -v oauth2 | grep -v .well-known | \
+        grep -v "{baseUrl}\?</strong>\/v" | grep -v /api/v | grep -v /oauth2 | grep -v /.well-known | \
         # The 'sed' command below pulls out the filename (\1), the line number (\2) and the URL path (\3)
         # For example, this:
         # dist/docs/api/resources/authn.html:2278:<p><span class="api-uri-template api-uri-post"><span class="api-label">POST</span> /api/v1/authn</span></p>
@@ -26,16 +26,13 @@ function url_consistency_check() {
         sed -e 's/^\([^:]*\):\([^:]*\).*<\/span> \(.*\)<\/span>.*/\1:\2:\3/' | \
         # Write the results to STDOUT and the $url_consistency_check_file
         tee $url_consistency_check_file
-    interject "Done checking $GENERATED_SITE_LOCATION for proper prefixes in URLs"
     # Return "True" if the file is empty
     return `[ ! -s $url_consistency_check_file ]`
 }
 
 function duplicate_slug_in_url() {
-    interject "Checking ${GENERATED_SITE_LOCATION} to verify duplicate /api/v1 does not exist"
     output_file=`mktemp`
     find $GENERATED_SITE_LOCATION -iname '*.html' | xargs grep '/api/v1/api/v1' | tee $output_file
-    interject "Done checking $GENERATED_SITE_LOCATION for duplicate slugs"
     # Return "True" if the file is empty
     return `[ ! -s $output_file ]`
 }
@@ -105,47 +102,24 @@ function generate_html() {
     fi
 }
 
+function generate_conductor_file() {
+    pushd $GENERATED_SITE_LOCATION
+    CONDUCTOR_FILE=conductor.yml
+    find -type f -iname 'index.html' | xargs dirname | sed -s "s/^\.//" | while read -r line ; do
+        if [ ! -z "${line}" ]; then
+            echo "  - from: ${line}" >> ${CONDUCTOR_FILE}
+            echo "    to: ${line}/" >> ${CONDUCTOR_FILE}
+        fi
+    done
+    popd
+}
+
 function require_env_var() {
     local env_var_name=$1
     eval env_var=\$$env_var_name
     if [[ -z "${env_var}" ]]; then
         echo "Environment variable '${env_var_name}' must be defined, but isn't.";
         exit 1
-    fi
-}
-
-# Verify for occurences of localhost:4000 have been removed
-function check_for_localhost_links() {
-    local links=$(grep -R "localhost:4000"  --include="*.html" ../* --exclude-dir={node_modules,scripts,tests,dist} --exclude={README.md,package.json})
-    if [ "$links" ];
-    then
-        echo $links
-        echo "Files contain localhost:4000!"
-        return 1
-    fi
-}
-
-# Verify for occurences of localhost have been removed
-function check_for_all_localhost_links() {
-    local dir=$(pwd)/dist
-    local links=$(grep -EoR "href=\"(http|https)://localhost"  --include="*.html" $dir)
-    if [ "$links" ];
-    then
-        echo $links
-        echo "Links contain localhost!"
-        return 1
-    fi
-}
-
-# Verify for occurences of 'index' contain .html
-function check_index_links() {
-    local dir=$(pwd)/_source
-    local links=$(grep -EoR "index#"  --include="*.md" $dir --exclude={README.md,package.json} | sort | uniq )
-    if [ "$links" ];
-    then
-        echo $links
-        echo "A link contains index without the filetype!"
-        return 1
     fi
 }
 
@@ -161,66 +135,10 @@ function header_checker() {
     fi
 }
 
-function check_sample_code_orgs() {
-    # Sample code URLS should be in the following format:
-    # Currently: https://your-org.okta.com
-    
-    local dir=$(pwd)
-    local yourOrgUrls=$(grep -EoR "(http|https)://your-org.okta*" --include="*.md" $dir --exclude-dir={node_modules,scripts,tests,dist} | sort | uniq)
-    local yourExampleUrls=$(grep -EoR "(http|https)://example.okta*" --include="*.md" $dir --exclude-dir={node_modules,scripts,tests,dist} | sort | uniq)
-    local rainUrls=$(grep -EoR "http://rain.okta1.com:1802*" --include="*.md" $dir --exclude-dir={node_modules,scripts,tests,dist} | sort | uniq)
-    local subdomainUrls=$(grep -EoR "(http|https)://your-subdomain.okta*" --include="*.md" $dir --exclude-dir={node_modules,scripts,tests,dist} | sort | uniq)
-    local yourDomainUrls=$(grep -EoR "(http|https)://your-domain.okta*" --include="*.md" $dir --exclude-dir={node_modules,scripts,tests,dist} | sort | uniq)
-    local jspUrls=$(grep -EoR "(http|https)://.*{org}.okta*" --include="*.md" $dir --exclude-dir={node_modules,scripts,tests,dist,s} | sort | uniq)
-    local oktaPreviewUrls=$(grep -EoR "(http|https)://.*oktapreview.com*" --include="*.md" $dir --exclude-dir={node_modules,scripts,tests,dist,_posts,getting_started} | sort | uniq)
-    
-    if [ "$yourOrgUrls" ];
+function check_for_quickstart_pages_in_sitemap() {
+    if grep "quickstart/[^<]" dist/sitemap.xml;
     then
-        echo "$yourOrgUrls"
-        echo "Files contain old URL reference -> https://your-org.okta{preview}.com"
-        return 1
-    fi
-
-    if [ "$yourExampleUrls" ];
-    then
-        echo "$yourExampleUrls"
-        echo "Files contain old URL reference -> https://example.okta{preview}.com"
-        return 1
-    fi
-
-    if [ "$rainUrls" ];
-    then
-        echo "$rainUrls"
-        echo "Files contain old URL reference -> http://rain.okta1.com:1802"
-        return 1
-    fi
-
-    if [ "$subdomainUrls" ];
-    then
-        echo "$subdomainUrls"
-        echo "Files contain old URL reference -> https://subdomain.okta{preview}.com"
-        return 1
-    fi
-
-    if [ "$yourDomainUrls" ];
-    then
-        echo "$yourDomainUrls"
-        echo "Files contain old URL reference -> https://your-domain.okta{preview}.com"
-        return 1
-    fi
-
-    if [ "$jspUrls" ];
-    then
-        echo "$jspUrls"
-        echo "Files contain old URL reference -> https://\${org}.okta{preview}.com"
-        return 1
-    fi
-
-    if [ "$oktaPreviewUrls" ];
-    then
-        echo "$oktaPreviewUrls"
-        echo "Files contain old URL reference -> oktapreview.com"
-        return 1
+        exit 1
     fi
 }
 
@@ -231,4 +149,28 @@ function fold() {
     echo "\$ ${command}"
     ${command}
     echo -en "travis_fold:end:${name}\\r"
+}
+
+function send_promotion_message() {
+    curl -H "Authorization: Bearer ${TESTSERVICE_SLAVE_JWT}" \
+      -H "Content-Type: application/json" \
+      -X POST -d "[{\"artifactId\":\"$1\",\"repository\":\"npm-okta\",\"artifact\":\"$2\",\"version\":\"$3\",\"promotionType\":\"ARTIFACT\"}]" \
+      -k "${APERTURE_BASE_URL}/v1/artifact-promotion/createPromotionEvent"
+}
+
+function removeHTMLExtensions() {
+    # Removing all generated .html files (excludes the main 'index.html' in the dir) and
+    # create 302 redirects to extensionless pages
+    find ./dist -type f ! -iname 'index.html' -name '*.html' -print0 | while read -d $'\0' f
+    do
+
+        if [ -e `echo ${f%.html}` ] ;
+        then
+            # Skip if files have already been updated
+            continue;
+        fi
+        cp "$f" "${f%.html}";
+        path=`echo ${f%.html} | sed "s/.\/dist//g"`
+        sed "s+{{ page.redirect.to | remove: 'index' }}+$path+g" ./_source/_layouts/redirect.html > $f
+    done
 }

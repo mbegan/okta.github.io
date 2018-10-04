@@ -1,6 +1,7 @@
 ---
 layout: docs_page
 title: Events
+category: management
 redirect_from: "/docs/api/rest/events.html"
 ---
 
@@ -8,7 +9,7 @@ redirect_from: "/docs/api/rest/events.html"
 
 The Okta Events API provides read access to your organization's system log. [Export event data](https://support.okta.com/help/Documentation/Knowledge_Article/Exporting-Okta-Log-Data) as a batch job from your organization to another system for reporting or analysis.
 
-> The new beta [System Log API](/docs/api/resources/system_log.html) will eventually replace the Events API and contains much more [structured data](/docs/api/resources/system_log.html#log-objects).
+> **Important:** the [System Log API](/docs/api/resources/system_log) will eventually replace the Events API and contains much more [structured data](/docs/api/resources/system_log#logevent-object). Developers of new projects are strongly recommended to use the System Log API in lieu of the Events API. For information on migrating from the Events API to the System Log API please see [Events API Migration](/use_cases/events-api-migration/).
 
 ## Getting Started
 
@@ -34,12 +35,12 @@ Fetches a list of events from your Okta organization system log
 |:----------|:--------------------------------------------------------------------------------------------|:-----------|:---------|:---------|:--------|
 | limit     | Specifies the number of results to page                                                     | Query      | Number   | FALSE    | 1000    |
 | startDate | Specifies the timestamp to list events after                                                | Query      | Date     | FALSE    |         |
-| filter    |   [Filter expression](/docs/api/getting_started/design_principles.html#filtering) for events  | Query      | String   | FALSE    |         |
+| filter    | [Filter expression](/docs/api/getting_started/design_principles#filtering) for events  | Query      | String   | FALSE    |         |
 | after     | Specifies the pagination cursor for the next page of events                                 | Query      | String   | FALSE    |         |
 
 Parameter Details
 
-* Treat the `after` cursor as an opaque value as its contents are subject to change without notice. Obtain it through the `next` link relation. See [Pagination](/docs/api/getting_started/design_principles.html#pagination) for more details on link relations.
+* Treat the `after` cursor as an opaque value as its contents are subject to change without notice. Obtain it through the `next` link relation. See [Pagination](/docs/api/getting_started/design_principles#pagination) for more details on link relations.
 * `startDate` and `filter` query parameters are mutually exclusive and cannot be used together in the same request.
 * `startDate` and `after` query parameters are mutually exclusive and cannot be used together in the same request.
 * `startDate` defaults to 1 hour ago when `filter`, `after` and `startDate` query parameters are omitted.
@@ -47,18 +48,18 @@ Parameter Details
 
 ###### Reliable Ingestion
 
-The most reliable method to ingest all events from Okta is to use a [pagination](/docs/api/getting_started/design_principles.html#pagination) cursor via the `after` parameter. This will ensure that events are not skipped or duplicated due to the lack of timestamp precision.
+The most reliable method to ingest all events from Okta is to use a [pagination](/docs/api/getting_started/design_principles#pagination) cursor via the `after` parameter. This will ensure that events are not skipped or duplicated due to the lack of timestamp precision.
 
 The general sequence of steps to leverage the `after` parameter:
 
 1. Issue an initial request using `startDate` with a value set to some date in the last 90 days
-1. Retrieve the next page of events through the [`Link` response header](/docs/api/getting_started/design_principles.html#link-header) value with the `next` link relation
+1. Retrieve the next page of events through the [`Link` response header](/docs/api/getting_started/design_principles#link-header) value with the `next` link relation
 1. Optionally include a `filter` parameter to narrow the returned results
 1. Issue the paginated request
-1. Retrieve the next page of events through the `Link` response header value with the `next` link relation 
+1. Retrieve the next page of events through the `Link` response header value with the `next` link relation
 1. Pause and repeat the previous step
 
-Note that if no data is returned, this typically indicates you have caught up with the event stream. To avoid issues with [rate limiting](/docs/api/getting_started/design_principles.html#rate-limiting), ensure your polling frequency is sufficiently long.
+Note that if no data is returned, this typically indicates you have caught up with the event stream. To avoid issues with [rate limiting](/docs/api/getting_started/rate-limits), ensure your polling frequency is sufficiently long.
 
 ###### Filters
 
@@ -66,14 +67,14 @@ The following expressions are supported for events with the `filter` query param
 
 | Filter                                      | Description                                                                          |
 |:--------------------------------------------|:-------------------------------------------------------------------------------------|
-| `action.objectType eq ":actionType"`        | Events that have a specific   [action objectType](#action-objecttypes)                 |
-| `target.objectType eq ":objectType"`        | Events published with a specific   [target objectType](#actor-and-target-objecttypes)  |
+| `action.objectType eq ":actionType"`        | Events that have a specific [action objectType](#action-objecttypes)                 |
+| `target.objectType eq ":objectType"`        | Events published with a specific [target objectType](#actor-and-target-objecttypes)  |
 | `target.id eq ":id"`                        | Events published with a specific target id                                           |
 | `published lt "yyyy-MM-dd'T'HH:mm:ss.SSSZ"` | Events published before a specific datetime                                          |
 | `published eq "yyyy-MM-dd'T'HH:mm:ss.SSSZ"` | Events published updated at a specific datetime                                      |
 | `published gt "yyyy-MM-dd'T'HH:mm:ss.SSSZ"` | Events published updated after a specific datetime                                   |
 
-See [Filtering](/docs/api/getting_started/design_principles.html#filtering) for more information on expressions.
+See [Filtering](/docs/api/getting_started/design_principles#filtering) for more information on expressions.
 
 >Note: All filters must be [URL encoded](http://en.wikipedia.org/wiki/Percent-encoding) where `filter=published gt "2017-10-01T00:00:00.000Z"` is encoded as `filter=published%20gt%20%222017-10-01T00:00:00.000Z%22`.
 
@@ -120,7 +121,7 @@ curl -v -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/events?startDate=2013-07-15T16%3A00%3A00.000Z\&limit=3"
+"https://{yourOktaDomain}/api/v1/events?startDate=2013-07-15T16%3A00%3A00.000Z\&limit=3"
 ~~~
 
 ##### Response Example
@@ -129,8 +130,8 @@ curl -v -X GET \
 ~~~http
 HTTP/1.1 200 OK
 Content-Type: application/json
-Link: <https://{yourOktaDomain}.com/api/v1/events?startDate=2017-09-15T16%3A00%3A00.000Z&limit=3>; rel="self"
-Link: <https://{yourOktaDomain}.com/api/v1/events?after=tevZxTo4IyHR9yUHIFdU0-f0w1373905100000&limit=3>; rel="next"
+Link: <https://{yourOktaDomain}/api/v1/events?startDate=2017-09-15T16%3A00%3A00.000Z&limit=3>; rel="self"
+Link: <https://{yourOktaDomain}/api/v1/events?after=tevZxTo4IyHR9yUHIFdU0-f0w1373905100000&limit=3>; rel="next"
 
 [
     {
@@ -296,11 +297,11 @@ The Event model is read only, with a fixed set of attributes:
 | published | Timestamp when event was published                                    | Date                                                           | FALSE    | TRUE   | TRUE     | 1         | 255       |
 | requestId | Identifies the request                                                | String                                                         | TRUE     | FALSE  | TRUE     | 1         | 50        |
 | sessionId | Session in which the event occurred                                   | String                                                         | TRUE     | FALSE  | TRUE     |           |           |
-| action    | Identifies the action that the event describes                        |   [Action Object](#action-object)                                | FALSE    | FALSE  | TRUE     |           |           |
-| actors    | Describes zero or more entities that performed the action             | Array of   [Actor Object](#actor-object)                         | FALSE    | FALSE  | TRUE     |           |           |
-| targets   | Describes zero or more entities that the action was performed against | Array of   [Target Object](#target-object)                       | TRUE     | FALSE  | TRUE     |           |           |
-| _links    | discoverable resources related to the event                           |   [JSON HAL](http://tools.ietf.org/html/draft-kelly-json-hal-06) | TRUE     | FALSE  | TRUE     |           |           |
-| _embedded | embedded resources related to the event                               |   [JSON HAL](http://tools.ietf.org/html/draft-kelly-json-hal-06) | TRUE     | FALSE  | TRUE     |           |           |
+| action    | Identifies the action that the event describes                        | [Action Object](#action-object)                                | FALSE    | FALSE  | TRUE     |           |           |
+| actors    | Describes zero or more entities that performed the action             | Array of [Actor Object](#actor-object)                         | FALSE    | FALSE  | TRUE     |           |           |
+| targets   | Describes zero or more entities that the action was performed against | Array of [Target Object](#target-object)                       | TRUE     | FALSE  | TRUE     |           |           |
+| _links    | discoverable resources related to the event                           | [JSON HAL](http://tools.ietf.org/html/draft-kelly-json-hal-06) | TRUE     | FALSE  | TRUE     |           |           |
+| _embedded | embedded resources related to the event                               | [JSON HAL](http://tools.ietf.org/html/draft-kelly-json-hal-06) | TRUE     | FALSE  | TRUE     |           |           |
 
 Property Details
 
@@ -314,8 +315,8 @@ Describes an activity performed by a user, app, client, or other entity (actor) 
 | Property   | Description                                                     | DataType        | Nullable |
 |:-----------|:----------------------------------------------------------------|:----------------|:---------|
 | message    | Description of an action                                        | String          | FALSE    |
-| categories |   [Categories](#action-categories) for an action                  | Array of String | FALSE    |
-| objectType | Identifies the   [unique type](#action-objecttypes) of an action  | String          | FALSE    |
+| categories | [Categories](#action-categories) for an action                  | Array of String | FALSE    |
+| objectType | Identifies the [unique type](#action-objecttypes) of an action  | String          | FALSE    |
 | requestUri | Uri of the request that generated the event.                    | String          | TRUE     |
 
 Actions that do not define any categories will have a zero element array value.
@@ -376,7 +377,7 @@ The action `objectType` identifies the unique action performed.
 | app.user_management.importing_profile                            | Create or update user's profile from application                          |
 | app.user_management.update_from_master_failed                    | Failed to master user's profile from application                          |
 | app.user_management.verified_user_with_thirdparty                | Verified user against application                                         |
-| app.user_management.updating_api_credentials_for_password_change | Updating API credentials due to  API admin user password change           |
+| app.user_management.updating_api_credentials_for_password_change | Updating API credentials due to  API administrator user password change           |
 | app.user_management.activate_user                                | Activate user in application                                              |
 | app.user_management.deactivate_user                              | Deactivate user in application                                            |
 | app.user_management.reactivate_user                              | Reactivate user in application                                            |
@@ -429,7 +430,7 @@ The action `objectType` identifies the unique action performed.
 | app.rich_client.login_failure           |
 | app.rich_client.login_success           |
 
-##### Admin Appplication
+##### Administrator Appplication
 
 | ObjectType                    |
 |:------------------------------|
@@ -552,7 +553,7 @@ Describes the user, app, client, or other entity (actor) who performed an action
 |:------------|:-----------------------------------------------------------|:---------|:---------|
 | id          | Unique key for actor                                       | String   | FALSE    |
 | displayName | Name of actor used for display purposes                    | String   | TRUE     |
-| objectType  |       [User](#user-objecttype) or       [Client](#client-objecttype)   | String   | FALSE    |
+| objectType  | [User](#user-objecttype) or [Client](#client-objecttype)   | String   | FALSE    |
 
 
 The schema of an actor is dependent on the actor's `objectType`.
@@ -565,7 +566,7 @@ The entity upon which an actor performs an action. Targets may be anything, even
 |:------------|:---------------------------------------------------------------------|:---------|:---------|
 | id          | Unique key for target                                                | String   | FALSE    |
 | displayName | Name of target used for display purposes                             | String   | TRUE     |
-| objectType  |     [User](#user-objecttype) or     [AppInstance](#appinstance-objecttype)   | String   | FALSE    |
+| objectType  | [User](#user-objecttype) or [AppInstance](#appinstance-objecttype)   | String   | FALSE    |
 
 The schema of a target is dependent on the actor's `objectType`
 
@@ -573,13 +574,13 @@ The schema of a target is dependent on the actor's `objectType`
 
 #### User ObjectType
 
-A denormalized reference to a [User](users.html#user-model):
+A denormalized reference to a [User](users#user-model):
 
 | Property    | Description                                             | DataType | Nullable |
 |:------------|:--------------------------------------------------------|:---------|:---------|
-| id          | Unique key for     [user](users.html#user-model)            | String   | FALSE    |
-| displayName |     [User's](users.html#profile-object) first and last name | String   | TRUE     |
-| login       | Unique login for     [user](users.html#user-model)          | String   | TRUE     |
+| id          | Unique key for [user](users#user-model)            | String   | FALSE    |
+| displayName | [User's](users#profile-object) first and last name | String   | TRUE     |
+| login       | Unique login for [user](users#user-model)          | String   | TRUE     |
 | objectType  | Type of object                                          | `User`   | FALSE    |
 
 ~~~ json
@@ -591,7 +592,7 @@ A denormalized reference to a [User](users.html#user-model):
 }
 ~~~
 
-The user can be retrieved by `id` with the [User API](users.html#get-user-with-id).
+The user can be retrieved by `id` with the [User API](users#get-user-with-id).
 
 #### AppInstance ObjectType
 
@@ -599,8 +600,8 @@ Describes an application:
 
 | Property    | Description                                        | DataType      | Nullable |
 |:------------|:---------------------------------------------------|:--------------|:---------|
-| id          | Unique key for    [app](apps.html#application-model)  | String        | FALSE    |
-| displayName |    [App's](apps.html#application-model) label         | String        | TRUE     |
+| id          | Unique key for [app](apps#application-model)  | String        | FALSE    |
+| displayName | [App's](apps#application-model) label         | String        | TRUE     |
 | objectType  | Type of object                                     | `AppInstance` | FALSE    |
 
 ~~~ json
@@ -611,7 +612,7 @@ Describes an application:
 }
 ~~~
 
-The app can be retrieved by `id` with the [Apps API](apps.html#get-application).
+The app can be retrieved by `id` with the [Apps API](apps#get-application).
 
 #### Client ObjectType
 
