@@ -2,22 +2,26 @@
 layout: blog_post
 title: 'Build an Ionic App with User Authentication'
 author: mraible
+description: "Ionic is an open source mobile SDK for developing native and progressive web applications. With Okta and OpenID Connect (OIDC) you can easily integrate authentication into an Ionic application, and never have to build it yourself again."
 tags: [ionic, authentication, oidc, angular, cordova, iphone, android, ios, okta]
+tweets:
+    - "Learn how to build an @ionicframework app with user authentication →"
+    - "Leverage OIDC and @okta to add authentication to your Ionic app →"
 ---
 
-With Okta and OpenID Connect (OIDC) you can easily integrate authentication into an Ionic application, and never have to build it yourself again. OIDC allows you to authenticate directly against the [Okta API](/), and this article shows you how to do just that in an Ionic application. I'll demo how to log in with OIDC redirect, using Okta's Auth SDK, and using OAuth with Cordova's in-app browser; user registration is omitted as the feature is still under active development. 
+With Okta and OpenID Connect (OIDC) you can easily integrate authentication into an Ionic application, and never have to build it yourself again. OIDC allows you to authenticate directly against the [Okta API](https://developer.okta.com/product/), and this article shows you how to do just that in an Ionic application. I'll demo how to log in with OIDC redirect, using Okta's Auth SDK as well as how to use OAuth with Cordova's in-app browser; user registration is omitted as the feature is still under active development.
 
-## Why Ionic? 
+## Why Ionic?
 
-Ionic is an open source mobile SDK for developing native and progressive web applications. It leverages Angular and [Apache Cordova](https://cordova.apache.org/) to allow you to build mobile apps with HTML, CSS, and JavaScript. Apache Cordova embeds the HTML code inside a native WebView on the device, using a foreign function interface to access the native resources of it. You might've heard of [PhoneGap](http://phonegap.com/) - this is Adobe's commercial version of Cordova. 
+Ionic is an open source mobile SDK for developing native and progressive web applications. It leverages Angular and [Apache Cordova](https://cordova.apache.org/) to allow you to build mobile apps with HTML, CSS, and JavaScript. Apache Cordova embeds the HTML code inside a native WebView on the device, using a foreign function interface to access the native resources of it. You might've heard of [PhoneGap](http://phonegap.com/) - this is Adobe's commercial version of Cordova.
 
 Cordova and PhoneGap allow you to target multiple platforms (e.g. Android and iOS) with one codebase. Not only that, but the apps look like native apps and perform just as well. If you need to tap into native features that aren't available in web technologies, there are a number of native plugins. [Ionic Native](https://ionicframework.com/docs/native/) is a curated set of these plugins.
 
-I first started using Ionic in late 2013. The project I was working on was developing a native application, but wanted to build several screens of the application with HTML so web developers could author them. I [wrote about my experience in March 2014](https://raibledesigns.com/rd/entry/developing_an_ios_native_app). I enjoyed working with it and found that porting an existing app to use it was more about modifying HTML and tweaking CSS. 
+I first started using Ionic in late 2013. The project I was working on was developing a native application, but wanted to build several screens of the application with HTML so web developers could author them. I [wrote about my experience in March 2014](https://raibledesigns.com/rd/entry/developing_an_ios_native_app). I enjoyed working with it and found that porting an existing app to use it was more about modifying HTML and tweaking CSS.
 
-Ionic 2 was [released in January](http://blog.ionic.io/announcing-ionic-2-0-0-final/), making it possible to develop Ionic applications with Angular. Ionic 3 was [released in April](http://blog.ionic.io/ionic-3-0-has-arrived/), allowing development with Angular 4.
+Ionic 2 was [released in January](http://blog.ionicframework.com/announcing-ionic-2-0-0-final/), making it possible to develop Ionic applications with Angular. Ionic 3 was [released in April](http://blog.ionicframework.com/ionic-3-0-has-arrived/), allowing development with Angular 4.
 
-**NOTE:** “Angular” is the common name for Angular 2+. AngularJS is the common name for the 1.x versions. The reason for #ItsJustAngular is Angular 4 was released in March 2017. See [Branding Guidelines for Angular and AngularJS](http://angularjs.blogspot.com/2017/01/branding-guidelines-for-angular-and.html) for more information.
+**NOTE:** "Angular" is the common name for Angular 2+. AngularJS is the common name for the 1.x versions. The reason for #ItsJustAngular is Angular 4 was released in March 2017. See [Branding Guidelines for Angular and AngularJS](http://angularjs.blogspot.com/2017/01/branding-guidelines-for-angular-and.html) for more information.
 
 This article will show you how to build a simple Ionic application and add user authentication to it. Most applications require authentication, so they know who the user is. Once an app knows who you are, it can save your data and better personalization features.
 
@@ -34,7 +38,7 @@ From a terminal window, create a new application using the following command:
 ionic start ionic-auth
 ```
 
-You will be prompted to select a starter project and optionally link your app to your Ionic Dashboard. For this tutorial, choose the **tabs** starter project and do not connect the app to your Ionic Dashboard.
+You will be prompted to select a starter project. For this tutorial, choose the **tabs** starter project. When prompted to integrate your app with Cordova, answer yes. When prompted to install the free Ionic Pro SDK and connect your app, answer no.
 
 Project creation may take a minute or two to complete, depending on your internet connection speed. Run the commands below to start your Ionic application.
 
@@ -52,15 +56,15 @@ One slick feature of Ionic's `serve` command is it shows compilation errors in t
 {% img blog/ionic-authentication/typescript-error.png alt:"TypeScript Error" %}
 
 ## Add User Authentication
-Ionic Cloud offers a free [Auth](https://docs.ionic.io/services/auth/) service. It allows authentication with an email and password, as well as social providers like Facebook, Google, and Twitter. It provides several classes you can use to build authentication in its `@ionic/cloud-angular` dependency. It even has support [custom authentication](https://docs.ionic.io/services/auth/custom-auth.html), but it "requires your own server to handle authentication" and will be decommissioned on January 31, 2018.
+Ionic Cloud offers a free Auth service. It allows authentication with an email and password, as well as social providers like Facebook, Google, and Twitter. It provides several classes you can use to build authentication in its `@ionic/cloud-angular` dependency. It even has support for custom authentication, but it "requires your own server to handle authentication" and will be decommissioned on January 31, 2018.
 
 While there aren't many current tutorials on using this service, there are a few from last year.
 
-* Simon Reimler's [Simple Ionic 2 Login with Angular 2](https://devdactic.com/login-ionic-2/) 
-* Raymond Camden's [An example of the Ionic Auth service with Ionic 2](https://www.raymondcamden.com/2016/11/04/an-example-of-the-ionic-auth-service-with-ionic-2) 
-* Josh Morony's [Using JSON Web Tokens (JWT) for Custom Authentication in Ionic 2: Part 2](https://www.joshmorony.com/using-json-web-tokens-jwt-for-custom-authentication-in-ionic-2-part-2/) 
+* Simon Reimler's [Simple Ionic 2 Login with Angular 2](https://devdactic.com/login-ionic-2/)
+* Raymond Camden's [An example of the Ionic Auth service with Ionic 2](https://www.raymondcamden.com/2016/11/04/an-example-of-the-ionic-auth-service-with-ionic-2)
+* Josh Morony's [Using JSON Web Tokens (JWT) for Custom Authentication in Ionic 2: Part 2](https://www.joshmorony.com/using-json-web-tokens-jwt-for-custom-authentication-in-ionic-2-part-2/)
 
-You might notice that both tutorials require quite a bit of code. Also, there doesn't seem to be a lot of documentation on how you can verify user credentials from the Auth service in a backend service. 
+You might notice that both tutorials require quite a bit of code. Also, there doesn't seem to be a lot of documentation on how you can verify user credentials from the Auth service in a backend service.
 
 <a name="create-open-id-connect-app"></a>
 ## Create an OpenID Connect App in Okta
@@ -68,16 +72,22 @@ You might notice that both tutorials require quite a bit of code. Also, there do
 OpenID Connect (OIDC) builds on top of the OAuth 2.0 protocol. It allows clients to verify the identity of the user and obtain their basic profile information. To integrate Okta's Identity Platform for user authentication, you'll first need to:
 
 * [Register](https://developer.okta.com/signup/) and create an OIDC application
-* Log in to your Okta account and navigate to **Applications > Add Application** 
+* Log in to your Okta account and navigate to **Applications > Add Application**
 * Select **SPA** and click **Next**
 * Give your application a name (e.g. "Ionic OIDC")
 * Change the **Base URI** and **Login redirect URI** to `http://localhost:8100` and click **Done**. You should see settings like the following:
 
-{% img blog/ionic-authentication/oidc-settings.png alt:"Okta OIDC Settings" width:"800" %}
+{% img blog/ionic-authentication/oidc-settings.png alt:"Okta OIDC Settings" width:"700" %}{: .center-image }
 
 ## Create a Login Page
 
-To make a login page for authentication, create `src/pages/login/login.ts` and `src/pages/login/login.html`. In `login.html`, add a form with username and password fields.
+Generate a login page for authentication by running the following command:
+
+```bash
+ionic g page Login
+```
+
+In the generated `src/pages/login/login.html`, add a form with username and password fields.
 
 {% raw %}
 ```html
@@ -122,17 +132,17 @@ You can leverage a couple of open source libraries to perform the actual authent
 Install `angular-oauth2-oidc` and the Okta Auth SDK using npm.
 
 ```bash
-npm install angular-oauth2-oidc@1.0.20 @okta/okta-auth-js --save
+npm install angular-oauth2-oidc @okta/okta-auth-js --save
 ```
 
-In `src/pages/login/login.ts`, add the basic structure of the `LoginPage` class and a constructor that configures your OIDC settings with the `OAuthService` from angular-oauth2-oidc. You will need to replace “[client-id]” with the Client ID from your Okta OIDC settings and “[dev-id]” with your account's correct URI.
+In `src/pages/login/login.ts`, add the basic structure of the `LoginPage` class and a constructor that configures your OIDC settings with the `OAuthService` from angular-oauth2-oidc. You will need to replace `{clientId}` with the Client ID from your Okta OIDC settings and `{yourOktaDomain}` with your account's correct URI.
 
 ```typescript
 import { Component, ViewChild } from '@angular/core';
-import { NavController } from 'ionic-angular';
-import { OAuthService } from 'angular-oauth2-oidc';
-import OktaAuth from '@okta/okta-auth-js';
+import { IonicPage, NavController } from 'ionic-angular';
+import { JwksValidationHandler, OAuthService } from 'angular-oauth2-oidc';
 
+@IonicPage()
 @Component({
   selector: 'page-login',
   templateUrl: 'login.html'
@@ -145,9 +155,15 @@ export class LoginPage {
 
   constructor(private navCtrl: NavController, private oauthService: OAuthService) {
     oauthService.redirectUri = window.location.origin;
-    oauthService.clientId = '[client-id]';
+    oauthService.clientId = '{clientId}';
     oauthService.scope = 'openid profile email';
-    oauthService.issuer = 'https://dev-[dev-id].oktapreview.com/oauth2/default';
+    oauthService.issuer = 'https://{yourOktaDomain}/oauth2/default';
+    oauthService.tokenValidationHandler = new JwksValidationHandler();
+
+    // Load Discovery Document and then try to login the user
+    this.oauthService.loadDiscoveryDocument().then(() => {
+      this.oauthService.tryLogin();
+    });
   }
 
   ionViewDidLoad(): void {
@@ -192,46 +208,41 @@ export class MyApp {
 }
 ```
 
-Update `src/app/app.module.ts` to add `LoginPage` to its `declarations` and `entryComponents`. You'll also need to add `OAuthService` to its `providers`.
+Update `src/app/app.module.ts` to add `OAuthModule`, `HttpClientModule`, and `LoginPageModule` as imports.
 
 ```typescript
-import { LoginPage } from '../pages/login/login';
-import { OAuthService } from 'angular-oauth2-oidc';
+import { LoginPageModule } from '../pages/login/login.module';
+import { OAuthModule } from 'angular-oauth2-oidc';
 
 @NgModule({
-  declarations: [
-    ...
-    LoginPage
+  ...
+  imports: [
+    BrowserModule,
+    LoginPageModule,
+    OAuthModule.forRoot(),
+    IonicModule.forRoot(MyApp)
   ],
   ...
-  entryComponents: [
-    ...
-    LoginPage
-  ],
-  providers: [
-    OAuthService,
-    ...
-  ]
 })
 ```
 
 Run `ionic serve` to make sure the `LoginPage` is displayed when the app first loads. You'll see the following error when the app tries to load:
 
 ```
-No provider for Http!
+No provider for HttpClient!
 ```
 
 This error happens because `OAuthService` has a dependency on Angular's `Http`, but it hasn't been imported into your project. Add `HttpModule` as an import in `src/app/app.module.ts`.
 
 ```typescript
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   ...
   imports: [
-    BrowserModule,
-    HttpModule,
-    IonicModule.forRoot(MyApp)
+    ...
+    HttpClientModule,
+    ...
   ],
   ...
 })
@@ -244,6 +255,7 @@ Now the login screen should load. You can use Chrome's Device Toolbar to see wha
 Add a `login()` method in `src/app/pages/login/login.ts` that uses the Okta Auth SDK to 1) login and 2) exchange the session token for an identity and access token. An [ID token](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) is similar to an identity card, in standard JWT format, signed by the OpenID Provider. Access tokens are part of the OAuth specification. An access token can be a JWT. They are used to access protected resources, often by setting them as an `Authentication` header when making a request.
 
 ```typescript
+import * as OktaAuth from '@okta/okta-auth-js';
 import { TabsPage } from '../tabs/tabs';
 ...
 login(): void {
@@ -251,8 +263,8 @@ login(): void {
     const authClient = new OktaAuth({
       clientId: this.oauthService.clientId,
       redirectUri: this.oauthService.redirectUri,
-      url: 'https://dev-[dev-id].oktapreview.com',
-      issuer: this.oauthService.issuer
+      url: 'https://{yourOktaDomain}',
+      issuer: 'default'
     });
     return authClient.signIn({
       username: this.username,
@@ -266,11 +278,14 @@ login(): void {
           scopes: this.oauthService.scope.split(' ')
         })
           .then((tokens) => {
-            // oauthService.processIdToken doesn't set an access token
-            // set it manually so oauthService.authorizationHeader() works
-            localStorage.setItem('access_token', tokens[1].accessToken);
-            this.oauthService.processIdToken(tokens[0].idToken, tokens[1].accessToken);
-            this.navCtrl.push(TabsPage);
+            const idToken = tokens[0].idToken;
+            const accessToken = tokens[1].accessToken;
+            const keyValuePair = `#id_token=${encodeURIComponent(idToken)}&access_token=${encodeURIComponent(accessToken)}`;
+            this.oauthService.tryLogin({
+              customHashFragment: keyValuePair,
+              disableOAuth2StateCheck: true
+            });
+          this.navCtrl.push(TabsPage);
           });
       } else {
         throw new Error('We cannot handle the ' + response.status + ' status');
@@ -310,17 +325,17 @@ export class BeerService {
 }
 ```
 
-You can (optionally), pretty up the login screen by adding a logo above the form. Download [this image](https://www.okta.com/sites/all/themes/Okta/images/blog/Logos/Okta_Logo_BrightBlue_Medium.png), copy it to `src/assets/image/okta.png`, and add the following above the `<form>` tag in `login.html`. 
+You can (optionally), pretty up the login screen by adding a logo above the form. Download [this image](https://www.okta.com/sites/all/themes/Okta/images/blog/Logos/Okta_Logo_BrightBlue_Medium.png), copy it to `src/assets/imgs/okta.png`, and add the following above the `<form>` tag in `login.html`. You might want to edit the image so it's only 300 pixels wide. This reduces its size to 12 KB instead of 110 KB.
 
 ```html
 <ion-row>
   <ion-col text-center>
-    <img src="assets/image/okta.png" width="300">
+    <img src="assets/imgs/okta.png" width="300">
   </ion-col>
 </ion-row>
-``` 
+```
 
-When you sign in, there's not much proof on the UI. Add a “Logout” button in the top right corner of the home screen. Replace the `<ion-header>` in `src/pages/home/home.html` with the HTML below.
+When you sign in, there's not much proof on the UI. Add a "Logout" button in the top right corner of the home screen. Replace the `<ion-header>` in `src/pages/home/home.html` with the HTML below.
 
 ```html
 <ion-header>
@@ -335,11 +350,11 @@ When you sign in, there's not much proof on the UI. Add a “Logout” button in
 </ion-header>
 ```
 
-In `src/pages/home/home.ts`, add a `logout()` method, as well as methods to get a name and claims from the identity token. Claims in an ID token are bits of information about the issuer, the user, intended audience, expiration date, and issue date. You can see the [standard claims in the OIDC spec](https://openid.net/specs/openid-connect-core-1_0.html#IDToken). 
+In `src/pages/home/home.ts`, add a `logout()` method, as well as methods to get a name and claims from the identity token. Claims in an ID token are bits of information about the issuer, the user, intended audience, expiration date, and issue date. You can see the [standard claims in the OIDC spec](https://openid.net/specs/openid-connect-core-1_0.html#IDToken).
 
 ```typescript
 import { Component } from '@angular/core';
-import { NavController, App } from 'ionic-angular';
+import { App } from 'ionic-angular';
 import { LoginPage } from '../login/login';
 import { OAuthService } from 'angular-oauth2-oidc';
 
@@ -349,12 +364,12 @@ import { OAuthService } from 'angular-oauth2-oidc';
 })
 export class HomePage {
 
-  constructor(public app: App, public navCtrl: NavController, public oauthService: OAuthService) {
+  constructor(public app: App, public oauthService: OAuthService) {
   }
 
   logout() {
-    this.oauthService.logOut();
-    this.app.getRootNav().setRoot(LoginPage);
+    this.oauthService.logOut(true);
+    this.app.getRootNavs()[0].setRoot(LoginPage);
   }
 
   get givenName() {
@@ -403,7 +418,7 @@ page-home {
 }
 ```
 
-Now you should see your name and claims information displayed when you log in. 
+Now you should see your name and claims information displayed when you log in.
 
 {% img blog/ionic-authentication/home-claims.png alt:"Home claims" %}
 
@@ -448,7 +463,7 @@ cd platforms/ios/cordova && npm install ios-sim
 
 **TIP:** The biggest problem I found when running the app in Simulator was that it was difficult to get the keyboard to pop up. To workaround this, I used **Hardware** > **Keyboard** > **Toggle Software Keyboard** when I needed to type text in a field.
 
-If you enter your credentials on the login screen you'll notice nothing happens. Open Safari and navigate to **Develop** > **Simulator** > MyApp / **Login**, and you'll see that eventually, an error shows up in the console. If you don't see a Develop menu, review the steps in [this article](https://developer.apple.com/library/content/documentation/IDEs/Conceptual/iOS_Simulator_Guide/GettingStartedwithiOSSimulator/GettingStartedwithiOSSimulator.html) to enable it.
+If you enter your credentials on the login screen you'll notice nothing happens. Open Safari and navigate to **Develop** > **Simulator** > MyApp / **Login**, and you'll see that eventually, an error shows up in the console. If you don't see a Develop menu, review the steps in [this article](https://www.computerworld.com/article/3156141/apple-mac/how-to-use-the-safari-develop-menu-on-a-mac.html) to enable it.
 
 {% img blog/ionic-authentication/webinspector-error.png alt:"Web Inspector Error" %}
 
@@ -456,7 +471,7 @@ If you use the Network tab, you can see that only one network request is made (t
 
 {% img blog/ionic-authentication/devtools-network-requests.png alt:"DevTools Network Requests" %}
 
-I believe this doesn't work when the app is packaged with Cordova because it's making a request to the server with an embedded iframe that then posts back to the current window using postMessage. It seems that Ionic/Cordova doesn't support this flow (yet). To work around this issue, you can talk directly to Okta's OAuth service using an in-app browser that's provided by Cordova. [Nic Raboy](https://twitter.com/nraboy) shows how to do this with Facebook in [Using An OAuth 2.0 Service Within An Ionic 2 Mobile App](https://www.thepolyglotdeveloper.com/2016/01/using-an-oauth-2-0-service-within-an-ionic-2-mobile-app/). 
+I believe this doesn't work when the app is packaged with Cordova because it's making a request to the server with an embedded iframe that then posts back to the current window using postMessage. It seems that Ionic/Cordova doesn't support this flow (yet). To work around this issue, you can talk directly to Okta's OAuth service using an in-app browser that's provided by Cordova. [Nic Raboy](https://twitter.com/nraboy) shows how to do this with Facebook in [Using An OAuth 2.0 Service Within An Ionic 2 Mobile App](https://www.thepolyglotdeveloper.com/2016/01/using-an-oauth-2-0-service-within-an-ionic-2-mobile-app/).
 
 Install the [Cordova In-App Browser plugin](https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-inappbrowser/) using the following command:
 
@@ -493,8 +508,13 @@ Then add the methods below to facilitate logging in with OAuth.
 ```typescript
 redirectLogin() {
   this.oktaLogin().then(success => {
-    localStorage.setItem('access_token', success.access_token);
-    this.oauthService.processIdToken(success.id_token, success.access_token);
+    const idToken = success.id_token;
+    const accessToken = success.access_token;
+    const keyValuePair = `#id_token=${encodeURIComponent(idToken)}&access_token=${encodeURIComponent(accessToken)}`;
+    this.oauthService.tryLogin({
+      customHashFragment: keyValuePair,
+      disableOAuth2StateCheck: true
+    });
     this.navCtrl.push(TabsPage);
   }, (error) => {
     this.error = error;
@@ -551,7 +571,7 @@ buildOAuthUrl(state, nonce): string {
 }
 ```
 
-Change the `redirectUri` that's set in the constructor to hard-code `http://localhost:8100`. If you skip this step `window.location.origin` will result in a `file://` origin being sent when the app is running on a device. By making it a known URL, we can look for it with the in-app browser on the “loadstart” event.
+Change the `redirectUri` that's set in the constructor to hard-code `http://localhost:8100`. If you skip this step `window.location.origin` will result in a `file://` origin being sent when the app is running on a device. By making it a known URL, we can look for it with the in-app browser on the "loadstart" event.
 
 ```typescript
 constructor(private navCtrl: NavController, private oauthService: OAuthService) {
@@ -566,7 +586,7 @@ You'll have to re-deploy your app to your phone after making these changes.
 ionic cordova emulate ios
 ```
 
-Now you should be able to log in by clicking on the “Login with Okta” button and entering valid credentials.
+Now you should be able to log in by clicking on the "Login with Okta" button and entering valid credentials.
 
 | [{% img blog/ionic-authentication/emulator-login.png alt:"Emulator Login" width:"280" %}](/assets/blog/ionic-authentication/emulator-login-c4b218091f6549081c063e2eb71af4b1bcf371d49cffd109d3f77e6019ec85ce.png) | [{% img blog/ionic-authentication/emulator-okta-login.png alt:"Emulator Okta Login" width:"280" %}](/assets/blog/ionic-authentication/emulator-okta-login-03521c0da232257989de99fe3c41e81f1c822d1397d4b5e2e8a5371b21aef085.png) | [{% img blog/ionic-authentication/emulator-home.png alt:"Emulator Home" width:"280" %}](/assets/blog/ionic-authentication/emulator-home-935f74e0cd70e31bcf49f782c0b1371c8ad1af4d44f6da3002a91cbf42a95d55.png) |
 
@@ -605,41 +625,20 @@ To emulate or deploy to an Android device, you'll first need to install [Android
 
 **If you've just installed Android Studio, make sure to open it to complete the installation.**
 
-To deploy to the Android emulator, run `ionic cordova emulate android`. This command will install Android support and print out instructions about how to create an emulator image.
+To deploy to the Android emulator, run `ionic cordova emulate android`. This command will install Android support and display an error if you don't have any AVD (Android Virtual Device) images.
 
 ```
-Error: No emulator images (avds) found.
-1. Download desired System Image by running:
-/Users/mraible/Library/Android/sdk/tools/android sdk
+(node:9300) UnhandledPromiseRejectionWarning: CordovaError: No emulator images (avds) found.
+1. Download desired System Image by running: /Users/mraible/Library/Android/sdk/tools/android sdk
 2. Create an AVD by running: /Users/mraible/Library/Android/sdk/tools/android avd
 HINT: For a faster emulator, use an Intel System Image and install the HAXM device driver
 ```
 
-Run the first suggestion and download your desired system image. Then run the second command and created an AVD (Android Virtual Device) with the following settings:
-
-```
-AVD Name: TestPhone
-Device: Nexus 5
-Target: Android 7.1.1
-CPU/ABI: Google APIs Intel Axom (x86_64)
-Skin: Skin with dynamic hardware controls
-```
-
-**WARNING:** These instructions won't work with version 2.3.2 of Android Studio on Mac. When you try to run the first command, it'll say the following:
-
-```
-*************************************************************************
-The "android" command is deprecated.
-For manual SDK, AVD, and project management, please use Android Studio.
-For command-line tools, use tools/bin/sdkmanager and tools/bin/avdmanager
-*************************************************************************
-```
-
-To solve this problem, open Android Studio, select “Open an existing Android Studio project” and select the `ionic-auth/platforms/android` directory. If prompted to upgrade, choose “OK”, then proceed to create a new AVD as [described in Android Studio's documentation](https://developer.android.com/studio/run/managing-avds.html#createavd).
+To create a new AVD, open Android Studio and navigate to **Tools** > **Android** > **AVD Manager**. Create a new Virtual Device and click Play. I chose a Pixel 2.
 
 After performing these steps, you should be able to run `ionic cordova emulate android` and see your app running in the AVD.
 
-| [{% img blog/ionic-authentication/android-login.png alt:"Android Login" width:"280" %}](/assets/blog/ionic-authentication/android-login-a0363756fc25a974e87668bc0900acb783f7eec80a1b83b0c5de0a5016004f94.png) | [{% img blog/ionic-authentication/android-okta-login.png alt:"Android Okta Login" width:"280" %}](/assets/blog/ionic-authentication/android-okta-login-bb57b05d91580c165352d0f21d2da0415827601a25720ec2121f269ae20618ae.png) | [{% img blog/ionic-authentication/android-home.png alt:"Android Home" width:"280" %}](/assets/blog/ionic-authentication/android-home-9438a0b8324d932abc0dcece445af75c8009350e683bb46d526baaa614e1de13.png) |   
+| [{% img blog/ionic-authentication/android-login.png alt:"Android Login" width:"280" %}](/assets/blog/ionic-authentication/android-login-a0363756fc25a974e87668bc0900acb783f7eec80a1b83b0c5de0a5016004f94.png) | [{% img blog/ionic-authentication/android-okta-login.png alt:"Android Okta Login" width:"280" %}](/assets/blog/ionic-authentication/android-okta-login-bb57b05d91580c165352d0f21d2da0415827601a25720ec2121f269ae20618ae.png) | [{% img blog/ionic-authentication/android-home.png alt:"Android Home" width:"280" %}](/assets/blog/ionic-authentication/android-home-9438a0b8324d932abc0dcece445af75c8009350e683bb46d526baaa614e1de13.png) |
 
 **NOTE**: If you get an application error that says "The connection to the server was unsuccessful. (`file:///android/www/index.html`)", add the following line to `config.xml`. This line sets the default timeout to 60 seconds (default is 20). Thanks to the [Stack Overflow community](http://stackoverflow.com/a/31377846) for this solution.
 
@@ -648,12 +647,12 @@ After performing these steps, you should be able to run `ionic cordova emulate a
 ```
 
 ## PWAs with Ionic
-Ionic ships with support for creating progressive web apps (PWAs). This means you can deploy your Ionic app as a web app (rather than a mobile app) and make it run offline in [browsers that support service workers](http://caniuse.com/#feat=serviceworkers). 
+Ionic ships with support for creating progressive web apps (PWAs). This means you can deploy your Ionic app as a web app (rather than a mobile app) and make it run offline in [browsers that support service workers](http://caniuse.com/#feat=serviceworkers).
 
-You can see how to enable service workers and make your app into a PWA by reading the [PWAs section](/blog/2017/05/17/develop-a-mobile-app-with-ionic-and-spring-boot#pwas-with-ionic) of [how to develop a mobile app with Ionic and Spring Boot](/blog/2017/05/17/develop-a-mobile-app-with-ionic-and-spring-boot). A PWA is a web application that can be “installed” on your system. It works offline when you don't have an internet connection, leveraging data cached during your last interactions with the app. Adding PWA features can make your apps load a lot faster, creating happy users. To learn more about PWAs, see [The Ultimate Guide to Progressive Web Applications](/blog/2017/07/20/the-ultimate-guide-to-progressive-web-applications). 
+You can see how to enable service workers and make your app into a PWA by reading the [PWAs section](/blog/2017/05/17/develop-a-mobile-app-with-ionic-and-spring-boot#pwas-with-ionic) of [how to develop a mobile app with Ionic and Spring Boot](/blog/2017/05/17/develop-a-mobile-app-with-ionic-and-spring-boot). A PWA is a web application that can be "installed" on your system. It works offline when you don't have an internet connection, leveraging data cached during your last interactions with the app. Adding PWA features can make your apps load a lot faster, creating happy users. To learn more about PWAs, see [The Ultimate Guide to Progressive Web Applications](/blog/2017/07/20/the-ultimate-guide-to-progressive-web-applications).
 
 Ionic has invested heavily in supporting PWAs. You can read more about why in [
-What Progressive Web Apps can do for you](http://blog.ionic.io/what-progressive-web-apps-can-do-for-you/).
+What Progressive Web Apps can do for you](http://blog.ionicframework.com/what-progressive-web-apps-can-do-for-you/).
 
 ## Learn More
 
@@ -666,3 +665,8 @@ To learn more about Ionic, Angular, or Okta, please see the following resources:
 * [Adding Authentication to your Angular PWA](/blog/2017/06/13/add-authentication-angular-pwa)
 * [Tutorial: Develop a Mobile App With Ionic and Spring Boot](/blog/2017/05/17/develop-a-mobile-app-with-ionic-and-spring-boot)
 * [Build Your First Progressive Web Application with Angular and Spring Boot](/blog/2017/05/09/progressive-web-applications-with-angular-and-spring-boot)
+
+**Changelog:**
+
+* Mar 7, 2018: Updated instructions for creating an AVD with Android Studio 3.0.
+* Jan 11, 2018: Updated to use Ionic CLI 3.19.0 and angular-oauth2-oidc 3.1.4. See the code changes in the [example app on GitHub](https://github.com/oktadeveloper/okta-ionic-auth-example/pull/6). Changes to this article can be viewed [in this pull request](https://github.com/okta/okta.github.io/pull/1628).

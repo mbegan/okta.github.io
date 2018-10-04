@@ -1,6 +1,7 @@
 ---
 layout: docs_page
 title: Zones
+category: management
 ---
 
 # Zones API
@@ -55,7 +56,7 @@ curl -X POST
       "value": "3.3.4.5/24"
     }
   ]
-}' "https://{yourOktaDomain}.com/api/v1/zones/"
+}' "https://{yourOktaDomain}/api/v1/zones/"
 ~~~
 
 #### Successful Response Example
@@ -91,7 +92,7 @@ curl -X POST
   ],
   "_links": {
     "self": {
-      "href": "https://{yourOktaDomain}.com/api/v1/zones/nzouagptWUz5DlLfM0g3",
+      "href": "https://{yourOktaDomain}/api/v1/zones/nzouagptWUz5DlLfM0g3",
       "hints": {
         "allow": [
           "GET",
@@ -101,7 +102,7 @@ curl -X POST
       }
     },
     "deactivate": {
-      "href": "https://{yourOktaDomain}.com/api/v1/zones/nzouagptWUz5DlLfM0g3/lifecycle/deactivate",
+      "href": "https://{yourOktaDomain}/api/v1/zones/nzouagptWUz5DlLfM0g3/lifecycle/deactivate",
       "hints": {
         "allow": [
           "POST"
@@ -141,7 +142,7 @@ curl -X POST
     }
   ]
 }
-' "https://{yourOktaDomain}.com/api/v1/zones"
+' "https://{yourOktaDomain}/api/v1/zones"
 ~~~
 
 #### Unsuccessful Response Example
@@ -161,7 +162,7 @@ curl -X POST
 ~~~
 
 ### Get an IP Zone
-{% api_operation get /api/v1/zones/*:zoneId* %}
+{% api_operation get /api/v1/zones/${zoneId} %}
 
 Gets an IP zone by id
 
@@ -177,7 +178,7 @@ curl -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/zones/nzoo6s03dLsg2I7HK0g3"
+"https://{yourOktaDomain}/api/v1/zones/nzoo6s03dLsg2I7HK0g3"
 ~~~
 
 #### Response Example
@@ -199,7 +200,7 @@ curl -X GET \
     "proxies": null,
     "_links": {
         "self": {
-            "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoo6s03dLsg2I7HK0g3",
+            "href": "https://{yourOktaDomain}/api/v1/zones/nzoo6s03dLsg2I7HK0g3",
             "hints": {
                 "allow": [
                     "GET",
@@ -209,7 +210,7 @@ curl -X GET \
             }
         },
         "deactivate": {
-            "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoo6s03dLsg2I7HK0g3/lifecycle/deactivate",
+            "href": "https://{yourOktaDomain}/api/v1/zones/nzoo6s03dLsg2I7HK0g3/lifecycle/deactivate",
             "hints": {
                 "allow": [
                     "POST"
@@ -235,7 +236,7 @@ A subset of zones can be returned that match a supported filter expression or qu
 
 | Parameter  | Description                                                                                                                        | Param Type | DataType | Required |
 |:-----------|:-----------------------------------------------------------------------------------------------------------------------------------|:-----------|:---------|:---------|
-| filter     | [Filter](/docs/api/getting_started/design_principles.html#filtering) zones with a supported expression for a subset of properties  | Query      | String   |    No    |
+| filter     | [Filter](/docs/api/getting_started/design_principles#filtering) zones with a supported expression for a subset of properties  | Query      | String   |    No    |
 | limit      | Specifies the number of results returned                                                                                           | Query      | Integer  |    No    |
 
 ##### Response Parameters
@@ -255,7 +256,7 @@ curl -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/zones"
+"https://{yourOktaDomain}/api/v1/zones"
 ~~~
 
 ##### Response Example
@@ -279,7 +280,7 @@ curl -X GET \
         "proxies": null,
         "_links": {
             "self": {
-                "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoo6s03dLsg2I7HK0g3",
+                "href": "https://{yourOktaDomain}/api/v1/zones/nzoo6s03dLsg2I7HK0g3",
                 "hints": {
                     "allow": [
                         "GET",
@@ -289,7 +290,7 @@ curl -X GET \
                 }
             },
             "deactivate": {
-                "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoo6s03dLsg2I7HK0g3/lifecycle/deactivate",
+                "href": "https://{yourOktaDomain}/api/v1/zones/nzoo6s03dLsg2I7HK0g3/lifecycle/deactivate",
                 "hints": {
                     "allow": [
                         "POST"
@@ -315,7 +316,7 @@ curl -X GET \
         "proxies": null,
         "_links": {
             "self": {
-                "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoo6rs9ZUobuTcsr0g3",
+                "href": "https://{yourOktaDomain}/api/v1/zones/nzoo6rs9ZUobuTcsr0g3",
                 "hints": {
                     "allow": [
                         "GET",
@@ -325,7 +326,7 @@ curl -X GET \
                 }
             },
             "deactivate": {
-                "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoo6rs9ZUobuTcsr0g3/lifecycle/deactivate",
+                "href": "https://{yourOktaDomain}/api/v1/zones/nzoo6rs9ZUobuTcsr0g3/lifecycle/deactivate",
                 "hints": {
                     "allow": [
                         "POST"
@@ -351,7 +352,7 @@ curl -X GET \
         "proxies": null,
         "_links": {
             "self": {
-                "href": "https://{yourOktaDomain}.com/api/v1/zones/nzowduJMXKsPkRqL40g3",
+                "href": "https://{yourOktaDomain}/api/v1/zones/nzowduJMXKsPkRqL40g3",
                 "hints": {
                     "allow": [
                         "GET",
@@ -361,7 +362,7 @@ curl -X GET \
                 }
             },
             "deactivate": {
-                "href": "https://{yourOktaDomain}.com/api/v1/zones/nzowduJMXKsPkRqL40g3/lifecycle/deactivate",
+                "href": "https://{yourOktaDomain}/api/v1/zones/nzowduJMXKsPkRqL40g3/lifecycle/deactivate",
                 "hints": {
                     "allow": [
                         "POST"
@@ -378,9 +379,9 @@ curl -X GET \
 
 Lists all zones that match the filter criteria
 
-This operation requires [URL encoding](/docs/api/getting_started/design_principles.html#filtering). For example, `filter=(id eq "nzoul0wf9jyb8xwZm0g3" or id eq "nzoul1MxmGN18NDQT0g3")` is encoded as `filter=%28id+eq+%22nzoul0wf9jyb8xwZm0g3%22+or+id+eq+%22nzoul1MxmGN18NDQT0g3%22%29`.
+This operation requires [URL encoding](/docs/api/getting_started/design_principles#filtering). For example, `filter=(id eq "nzoul0wf9jyb8xwZm0g3" or id eq "nzoul1MxmGN18NDQT0g3")` is encoded as `filter=%28id+eq+%22nzoul0wf9jyb8xwZm0g3%22+or+id+eq+%22nzoul1MxmGN18NDQT0g3%22%29`.
 
-See [Filtering](/docs/api/getting_started/design_principles.html#filtering) for more information about the expressions used in filtering.
+See [Filtering](/docs/api/getting_started/design_principles#filtering) for more information about the expressions used in filtering.
 
 ##### Request Example
 {:.api .api-request .api-request-example}
@@ -389,7 +390,7 @@ curl -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/zones/?limit=100&filter=%28id+eq+%22nzoul0wf9jyb8xwZm0g3%22+or+id+eq+%22nzoul1MxmGN18NDQT0g3%22%29"
+"https://{yourOktaDomain}/api/v1/zones/?limit=100&filter=%28id+eq+%22nzoul0wf9jyb8xwZm0g3%22+or+id+eq+%22nzoul1MxmGN18NDQT0g3%22%29"
 ~~~
 
 ##### Response Example
@@ -442,7 +443,7 @@ curl -X GET \
     ],
     "_links": {
       "self": {
-        "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoul0wf9jyb8xwZm0g3",
+        "href": "https://{yourOktaDomain}/api/v1/zones/nzoul0wf9jyb8xwZm0g3",
         "hints": {
           "allow": [
             "GET",
@@ -452,7 +453,7 @@ curl -X GET \
         }
       },
       "deactivate": {
-        "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoul0wf9jyb8xwZm0g3/lifecycle/deactivate",
+        "href": "https://{yourOktaDomain}/api/v1/zones/nzoul0wf9jyb8xwZm0g3/lifecycle/deactivate",
         "hints": {
           "allow": [
             "POST"
@@ -507,7 +508,7 @@ curl -X GET \
     ],
     "_links": {
       "self": {
-        "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoul1MxmGN18NDQT0g3",
+        "href": "https://{yourOktaDomain}/api/v1/zones/nzoul1MxmGN18NDQT0g3",
         "hints": {
           "allow": [
             "GET",
@@ -517,7 +518,7 @@ curl -X GET \
         }
       },
       "deactivate": {
-        "href": "https://{yourOktaDomain}.com/api/v1/zones/nzoul1MxmGN18NDQT0g3/lifecycle/deactivate",
+        "href": "https://{yourOktaDomain}/api/v1/zones/nzoul1MxmGN18NDQT0g3/lifecycle/deactivate",
         "hints": {
           "allow": [
             "POST"
@@ -532,7 +533,7 @@ curl -X GET \
 ### Update an IP Zone
 {:.api .api-operation}
 
-{% api_operation put /api/v1/zones/*:zoneId* %}
+{% api_operation put /api/v1/zones/${zoneId} %}
 
 Updates an existing IP Zone
 
@@ -595,7 +596,7 @@ curl -X PUT
   ],
   "_links": {
     "self": {
-      "href": "https://{yourOktaDomain}.com/api/v1/zones/nzovw2rFz2YoqmvwZ0g3",
+      "href": "https://{yourOktaDomain}/api/v1/zones/nzovw2rFz2YoqmvwZ0g3",
       "hints": {
         "allow": [
           "GET",
@@ -605,7 +606,7 @@ curl -X PUT
       }
     },
     "deactivate": {
-      "href": "https://{yourOktaDomain}.com/api/v1/zones/nzovw2rFz2YoqmvwZ0g3/lifecycle/deactivate",
+      "href": "https://{yourOktaDomain}/api/v1/zones/nzovw2rFz2YoqmvwZ0g3/lifecycle/deactivate",
       "hints": {
         "allow": [
           "POST"
@@ -614,7 +615,7 @@ curl -X PUT
     }
   }
 }
-' "https://{yourOktaDomain}.com/api/v1/zones/nzovw2rFz2YoqmvwZ0g3"
+' "https://{yourOktaDomain}/api/v1/zones/nzovw2rFz2YoqmvwZ0g3"
 ~~~
 
 #### Response Example
@@ -666,7 +667,7 @@ curl -X PUT
   ],
   "_links": {
     "self": {
-      "href": "https://{yourOktaDomain}.com/api/v1/zones/nzovw2rFz2YoqmvwZ0g3",
+      "href": "https://{yourOktaDomain}/api/v1/zones/nzovw2rFz2YoqmvwZ0g3",
       "hints": {
         "allow": [
           "GET",
@@ -676,7 +677,7 @@ curl -X PUT
       }
     },
     "deactivate": {
-      "href": "https://{yourOktaDomain}.com/api/v1/zones/nzovw2rFz2YoqmvwZ0g3/lifecycle/deactivate",
+      "href": "https://{yourOktaDomain}/api/v1/zones/nzovw2rFz2YoqmvwZ0g3/lifecycle/deactivate",
       "hints": {
         "allow": [
           "POST"
@@ -759,7 +760,7 @@ Each address object specifies a set of IP addresses, expressed using either rang
   ],
   "_links": {
     "self": {
-      "href": "https://{yourOktaDomain}.com/api/v1/zones/nzouagptWUz5DlLfM0g3",
+      "href": "https://{yourOktaDomain}/api/v1/zones/nzouagptWUz5DlLfM0g3",
       "hints": {
         "allow": [
           "GET",
@@ -769,7 +770,7 @@ Each address object specifies a set of IP addresses, expressed using either rang
       }
     },
     "deactivate": {
-      "href": "https://{yourOktaDomain}.com/api/v1/zones/nzouagptWUz5DlLfM0g3/lifecycle/deactivate",
+      "href": "https://{yourOktaDomain}/api/v1/zones/nzouagptWUz5DlLfM0g3/lifecycle/deactivate",
       "hints": {
         "allow": [
           "POST"

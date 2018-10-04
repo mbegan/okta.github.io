@@ -3,6 +3,9 @@ layout: blog_post
 title: Android Unit Testing Part III&#58; Disintegration
 author: victor_ronin
 tags: [android, testing]
+redirect_from:
+  - "/blog/2015-04-07-android-unit-testing-part-3"
+  - "/blog/2015-04-23-android-unit-testing-part-3"
 ---
 *This is the third of a four part series on Android Unit Testing. In
 the last two articles I discussed the [general principles of having
@@ -25,8 +28,8 @@ into the end class.
 
 There are a lot of dependency injection frameworks for Android out
 there: Dagger, RoboGuice, SpringAndroid, Guice, and Transfuse are a
-few. I won’t go into a detailed comparison, but I like Dagger the
-most because it provides compile time injection, and doesn’t
+few. I won't go into a detailed comparison, but I like Dagger the
+most because it provides compile time injection, and doesn't
 influence runtime (specifically startup time) too much.
 
 Again, here there are detailed tutorials at the end of this post and
@@ -127,8 +130,8 @@ my summary is below:
 
 Now, instances of `Foo` and `Bar` are
 automatically injected in the runtime. However, your test will fail
-with NPE, because the Foo class has a Bar dependency which wasn’t
-delivered. I.e., we don’t want it injected by Dagger -— we want mocked
+with NPE, because the Foo class has a Bar dependency which wasn't
+delivered. I.e., we don't want it injected by Dagger -— we want mocked
 dependency, not a real one.
 
 ## Resources

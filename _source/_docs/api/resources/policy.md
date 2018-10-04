@@ -1,6 +1,7 @@
 ---
 layout: docs_page
 title: Policy
+category: management
 redirect_from: "/docs/getting_started/policy.html"
 ---
 
@@ -22,12 +23,16 @@ The policy API supports the following **rule operations**:
 * Create, read, update, and delete a rule for a policy
 * Activate and deactivate a rule
 
+## Getting Started
+
+Explore the Policy API: [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/0dfd99e544a12ea3db5b)
+
 ## Policy API Operations
 
 ### Get a Policy
 {:.api .api-operation}
 
-{% api_operation get /api/v1/policies/*:policyId* %}
+{% api_operation get /api/v1/policies/${policyId} %}
 
 #### Request Parameters
 
@@ -41,7 +46,7 @@ curl -v -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}"
 ~~~
 
 ##### Response Example
@@ -53,7 +58,7 @@ HTTP 200:
 ### Get a Policy with Rules
 {:.api .api-operation}
 
-{% api_operation get /api/v1/policies/*:policyId*?expand=rules %}
+{% api_operation get /api/v1/policies/${policyId}?expand=rules %}
 
 #### Request Parameters
 
@@ -68,7 +73,7 @@ curl -v -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}?expand=rules"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}?expand=rules"
 ~~~
 
 ##### Response Types
@@ -82,11 +87,11 @@ Included as embedded objects, one or more <a href="#rules">Policy Rules</a>.
 ### Get All Policies by Type
 {:.api .api-operation}
 
-{% api_operation get /api/v1/policies?type=*:type* %}
+{% api_operation get /api/v1/policies?type=${type} %}
 
 #### Request Parameters
 
-The policy ID described in the [Policy Object](#PolicyObject) is required.
+The policy type described in the [Policy Object](#PolicyObject) is required.
 
 ##### Request Example
 {:.api .api-request .api-request-example}
@@ -96,7 +101,7 @@ curl -v -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies?type={type}"
+"https://{yourOktaDomain}/api/v1/policies?type={type}"
 ~~~
 
 ##### Response Types
@@ -110,7 +115,7 @@ HTTP 204:
 ### Delete Policy
 {:.api .api-operation}
 
-{% api_operation delete /api/v1/policies/*:policyId* %}
+{% api_operation delete /api/v1/policies/${policyId} %}
 
 #### Request Parameters
 
@@ -124,7 +129,7 @@ curl -v -X DELETE \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}"
 ~~~
 
 ##### Response Types
@@ -136,7 +141,7 @@ HTTP 204:
 ### Update a Policy
 {:.api .api-operation}
 
-{% api_operation put /api/v1/policies/*:policyId* %}
+{% api_operation put /api/v1/policies/${policyId} %}
 
 #### Request Parameters
 
@@ -166,7 +171,7 @@ curl -v -X PUT \
          }
         }
      }, \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}"
 ~~~
 
 ##### Response Types
@@ -206,7 +211,7 @@ curl -v -X POST \
           }
         }
       }, \
-"https://{yourOktaDomain}.com/api/v1/policies"
+"https://{yourOktaDomain}/api/v1/policies"
 ~~~
 
 ##### Response Types
@@ -218,7 +223,7 @@ HTTP 204:
 ### Activate a Policy
 {:.api .api-operation}
 
-{% api_operation post /api/v1/policies/*:policyId*/lifecycle/activate %}
+{% api_operation post /api/v1/policies/${policyId}/lifecycle/activate %}
 
 #### Request Parameters
 
@@ -232,7 +237,7 @@ curl -v -X POST \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/lifecycle/activate"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/lifecycle/activate"
 ~~~
 
 ##### Response Types
@@ -244,7 +249,7 @@ HTTP 204:
 ### Deactivate a Policy
 {:.api .api-operation}
 
-{% api_operation post /api/v1/policies/*:policyId*/lifecycle/deactivate %}
+{% api_operation post /api/v1/policies/${policyId}/lifecycle/deactivate %}
 
 #### Request Parameters
 
@@ -258,7 +263,7 @@ curl -v -X POST \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/lifecycle/deactivate"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/lifecycle/deactivate"
 ~~~
 
 ##### Response Types
@@ -272,7 +277,7 @@ HTTP 200:
 ### Get Policy Rules
 {:.api .api-operation}
 
-{% api_operation get /api/v1/policies/*:policyId*/rules %}
+{% api_operation get /api/v1/policies/${policyId}/rules %}
 
 #### Request Parameters
 
@@ -286,7 +291,7 @@ curl -v -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/rules"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/rules"
 ~~~
 
 ##### Response Types
@@ -298,7 +303,7 @@ HTTP 200:
 ### Create a rule
 {:.api .api-operation}
 
-{% api_operation post /api/v1/policies/*:policyId*/rules %}
+{% api_operation post /api/v1/policies/${policyId}/rules %}
 
 #### Request Parameters
 
@@ -336,7 +341,7 @@ curl -v -X POST \
       "access": "ALLOW"
     }
   }' \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/rules"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/rules"
 ~~~
 
 ##### Response Types
@@ -348,7 +353,7 @@ HTTP 200:
 ### Delete a rule
 {:.api .api-operation}
 
-{% api_operation delete /api/v1/policies/*:policyId*/rules/*:ruleId* %}
+{% api_operation delete /api/v1/policies/${policyId}/rules/${ruleId} %}
 
 #### Request Parameters
 
@@ -362,7 +367,7 @@ curl -v -X DELETE \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/rules/{ruleId}"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/rules/{ruleId}"
 ~~~
 
 ##### Response Types
@@ -374,7 +379,7 @@ HTTP 204:
 ### Get a rule
 {:.api .api-operation}
 
-{% api_operation get /api/v1/policies/*:policyId*/rules/*:ruleId* %}
+{% api_operation get /api/v1/policies/${policyId}/rules/${ruleId} %}
 
 #### Request Parameters
 
@@ -388,7 +393,7 @@ curl -v -X GET \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/rules/{ruleId}"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/rules/{ruleId}"
 ~~~
 
 ##### Response Types
@@ -400,7 +405,7 @@ HTTP 200:
 ### Update a rule
 {:.api .api-operation}
 
-{% api_operation put /api/v1/policies/*:policyId*/rules/*:ruleId* %}
+{% api_operation put /api/v1/policies/${policyId}/rules/${ruleId} %}
 
 #### Request Parameters
 
@@ -439,7 +444,7 @@ curl -v -X PUT \
     }
   }
 }' \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/rules/{ruleId}"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/rules/{ruleId}"
 ~~~
 
 ##### Response Types
@@ -451,7 +456,7 @@ HTTP 200:
 ### Activate A Rule
 {:.api .api-operation}
 
-{% api_operation post /api/v1/policies/*:policyId*/rules/*:ruleId*/lifecycle/activate %}
+{% api_operation post /api/v1/policies/${policyId}/rules/${ruleId}/lifecycle/activate %}
 
 #### Request Parameters
 
@@ -465,7 +470,7 @@ curl -v -X POST \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/rules/{ruleId}/lifecycle/activate"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/rules/{ruleId}/lifecycle/activate"
 ~~~
 
 ##### Response Types
@@ -477,7 +482,7 @@ HTTP 204:
 ### Deactivate A Rule
 {:.api .api-operation}
 
-{% api_operation post /api/v1/policies/*:policyId*/rules/*:ruleId*/lifecycle/deactivate %}
+{% api_operation post /api/v1/policies/${policyId}/rules/${ruleId}/lifecycle/deactivate %}
 
 #### Request Parameters
 
@@ -491,7 +496,7 @@ curl -v -X POST \
 -H "Accept: application/json" \
 -H "Content-Type: application/json" \
 -H "Authorization: SSWS ${api_token}" \
-"https://{yourOktaDomain}.com/api/v1/policies/{policyId}/rules/{ruleId}/lifecycle/deactivate"
+"https://{yourOktaDomain}/api/v1/policies/{policyId}/rules/{ruleId}/lifecycle/deactivate"
 ~~~
 
 ##### Response Types
@@ -517,6 +522,8 @@ Different policy types control settings for different operations.  All policy ty
 <a href="#OktaMFAPolicy">Okta MFA Policy</a>
 
 <a href="#GroupPasswordPolicy">Password Policy</a>
+
+[OAuth Authorization Policy](/docs/api/resources/authorization-servers#policy-object)
 
 ### Policy Priority and Defaults
 
@@ -603,10 +610,10 @@ The Policy model defines several attributes:
 Parameter | Description | Data Type | Required | Default
 | --- | --- | --- | ---
 id | Identifier of the policy | String | No | Assigned
-type | Policy type | Specifies the type of the policy, e.g. `OKTA_SIGN_ON` or `MFA_ENROLL` | Yes |
+type | Specifies the [type of policy](#policy-types). Valid values: `OKTA_SIGN_ON`, `PASSWORD`, `MFA_ENROLL`, `OAUTH_AUTHORIZATION_POLICY` | String | Yes |
 name | Name of the policy | String | Yes |
-system | This is set to 'true' on system policies, which cannot be deleted. | Boolean | No | false
-description | Description of the policy | String | No | Null
+system | This is set to `true` on system policies, which cannot be deleted. | Boolean | No | `false`
+description | Description of the policy. | String | No | Null
 priority | Priority of the policy | Int | No | Last / Lowest Priority
 status | Status of the policy: ACTIVE or INACTIVE | String | No | "ACTIVE"
 conditions | Conditions for policy | <a href="#PolicyConditionsObject">Conditions Object</a> | No |
@@ -727,8 +734,8 @@ The Rules model defines several attributes:
 Parameter | Description | Data Type | Required | Default
 | --- | --- | --- | ---
 id | Identifier of the rule | String | No | Assigned
-type | Rule type | `OKTA_SIGN_ON` or `PASSWORD` or `MFA_ENROLL` | Yes |
-status | Status of the rule: `ACTIVE` or `INACTIVE` | String | No | ACTIVE
+type | Rule type. Valid values: `OKTA_SIGN_ON` or `PASSWORD` or `MFA_ENROLL` | String (Enum) | Yes |
+status | Status of the rule: `ACTIVE` or `INACTIVE` | String (Enum) | No | ACTIVE
 priority | Priority of the rule | Integer | No | Last / Lowest Priority
 system | This is set to 'true' on system rules, which cannot be deleted. | Boolean | No | false
 created | Timestamp when the rule was created | Date | No | Assigned
@@ -823,15 +830,14 @@ authType |  | `ANY` or `RADIUS` | No |
 {: #NetworkConditionObject }
 
 Specifies a network selection mode, and a set of network zones to be included or excluded. If the connection parameter's data type is `ZONE`, exactly one of the include or exclude arrays is required.
-Specific zone ids to include or exclude are enumerated in the respective arrays. The [Zones API](./zones.html) can be used to manage network zones.
+Specific zone ids to include or exclude are enumerated in the respective arrays. The [Zones API](zones) can be used to manage network zones.
 
 Parameter | Description | Data Type | Required |
 | --- | --- | --- | ---
-connection | Network selection mode | `ANYWHERE`, `ZONE`, `ON_NETWORK`, or `OFF_NETWORK` | No |
+connection | Network selection mode | `ANYWHERE`, `ZONE` | No |
 include | The zones to include | Array | Only if connection data type is `ZONE` |
 exclude | The zones to exclude | Array | Only if connection data type is `ZONE` |
 
-> The `ON_NETWORK` and `OFF_NETWORK` data types are part of a {% api_lifecycle deprecated %} feature. Backward compatibility is maintained, but using `ZONE` is preferred.
 > The connection parameter may be set to the `ZONE` data type to select individual network zones.
 
 #### Network Condition Object Example
@@ -845,6 +851,21 @@ exclude | The zones to exclude | Array | Only if connection data type is `ZONE` 
     ]
   }
 ~~~
+
+If you want to include or exclude all zones, you should pass in "ALL_ZONES" as the only element in the include or exclude array
+
+#### Network Condition Object Example (exclude all zones)
+{: #NetworkConditionObjectExample }
+
+~~~json
+  "network": {
+    "connection": "ZONE",
+    "exclude": [
+      "ALL_ZONES"
+    ]
+  }
+~~~
+
 
 #### Authentication Provider Condition Object
 {: #AuthProviderConditionObject }
@@ -875,7 +896,7 @@ include | The AD integrations this policy applies to | Array | No | Include all 
 Okta Sign On Policy controls the manner in which a user is allowed to sign on to Okta, including whether they are challenged for multifactor authentication (MFA) and how long they are allowed to remain signed in before re-authenticating.
 
 >Note: Okta Sign On Policy is different from application sign-on policy, which determines the extra levels of authentication (if any) which must be performed before a specific Okta application can be invoked.
-Application sign-on policy can&#8217;t be configured via the API.
+Application sign-on policy can't be configured via the API.
 
 ### Policy Settings Data
 
@@ -918,7 +939,7 @@ requireFactor | Indicates if multi-factor authentication is required | Boolean |
 factorPromptMode | Indicates if the user should be challenged for second factor authentication (MFA) based on the device being used, a factor session lifetime, or on every sign on attempt. | `DEVICE`, `SESSION` or `ALWAYS` | Yes, if requireFactor is true | N/A
 rememberDeviceByDefault | Indicates if Okta should automatically remember the device  | Boolean | No | false
 factorLifetime | Interval of time that must elapse before the user is challenged for MFA, if the factor prompt mode is set to 'SESSION' | Integer | Yes, if requireFactor is true | N/A
-session | Properties governing the user&#8217;s session lifetime | <a href="#SignonSessionObject">Signon Session Object</a> | No |
+session | Properties governing the user's session lifetime | <a href="#SignonSessionObject">Signon Session Object</a> | No |
 
 
 ##### Signon Session Object
@@ -980,13 +1001,20 @@ Note that policy settings are included only for those factors which have been en
 
 Parameter | Description | Data Type | Required
 | --- | --- | --- | ---
+duo | Duo Security | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
+fido_u2f | FIDO U2F | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
+fido_webauthn | Windows Hello | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
 google_otp | Google Authenticator | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
+okta_call | Okta Voice Call | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
+okta_email | Okta Email | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
 okta_otp | Okta Verify TOTP | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
+okta_password | Okta Password | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
 okta_push | Okta Verify Push | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
 okta_question | Okta Security Question | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
 okta_sms | Okta SMS | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
 rsa_token | RSA Token | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
-symantec_vip | Symantic VIP | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
+symantec_vip | Symantec VIP | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
+yubikey_token | Yubikey Token | <a href="#PolicyFactorObject">Policy MFA Factor Object</a> | No
 
 #### Policy MFA Factor Object
 {: #PolicyFactorObject }
@@ -1059,7 +1087,9 @@ The following conditions may be applied to the rules associated with MFA Enrollm
 ## Password Policy
 {: #GroupPasswordPolicy }
 
-Password policy controls settings that determine a user&#8217;s password length and complexity, as well as the frequency with which a password can be changed.  This policy also governs the recovery operations that may be performed by the user, including change password, reset (forgot) password and self-service password unlock.
+The Password policy determines the requirements for a user's password length and complexity, as well as the frequency with which a password must be changed. This policy also governs the recovery operations that may be performed by the user, including change password, reset (forgot) password and self-service password unlock.
+
+> **NOTE:** Password policies are enforced only for Okta and AD-mastered users. For AD-mastered users, ensure that your Active Directory policies don't conflict with the Okta policies.
 
 #### Policy Settings Example
 
@@ -1268,7 +1298,7 @@ options | Delegation options | <a href="#DelegationOptionsObject">Delegation Opt
 
 Property | Description | Data Type | Required | Default
 | --- | --- | --- | ---
-skipUnlock | Indicates if, when performing an unlock operation on an Active Directory mastered user who is locked out of Okta, the system should also attempt to unlock the user&#8217;s Windows account. | Boolean | No | false
+skipUnlock | Indicates if, when performing an unlock operation on an Active Directory mastered user who is locked out of Okta, the system should also attempt to unlock the user's Windows account. | Boolean | No | false
 
 ### Policy Conditions
 The following conditions may be applied to Password Policy
@@ -1331,5 +1361,3 @@ The following conditions may be applied to the rules associated with Password Po
 <a href="#PeopleObject">People Condition</a>
 
 <a href="#NetworkConditionObject">Network Condition</a>
-
-

@@ -1,5 +1,5 @@
 {% assign active_documentation = '' %}
-{% assign documentation_dirs = "code,documentation,docs,standards,use_cases" | split:"," %}
+{% assign documentation_dirs = "code,documentation,docs,standards,use_cases,reference,quickstart,authentication-guide" | split:"," %}
 
 {% for dir in documentation_dirs %}
   {% if page.url contains dir %}
@@ -17,8 +17,14 @@
 
     <nav class="Header-nav PrimaryNav">
       <ul class="menu">
-        <li class="first leaf">
+        <li class="first expanded">
           <a href="{{ site.external_domain }}/product/">Product</a>
+          <ul class="menu">
+            <li class="first leaf"><a href="{{ site.external_domain }}/product/">Overview</a></li>
+            <li class="leaf"><a href="{{ site.external_domain }}/product/authentication/">Authentication</a></li>
+            <li class="leaf"><a href="{{ site.external_domain }}/product/authorization/">Authorization</a></li>
+            <li class="last leaf"><a href="{{ site.external_domain }}/product/user-management/">User Management</a></li>
+          </ul>
         </li>
         <li class="leaf">
           <a href="{{ site.external_domain }}/pricing/">Pricing</a>
@@ -26,8 +32,12 @@
         <li class="leaf">
           <a href="/blog/"{% if page.url contains "/blog/" %} class="active"{% endif %}>Blog</a>
         </li>
-        <li class="leaf">
+        <li class="expanded">
           <a href="/documentation/"{{ active_documentation }}>Docs</a>
+          <ul class="menu">
+            <li class="first leaf"><a href="/documentation/">Get Started</a></li>
+            <li class="last leaf"><a href="/reference/">API Reference</a></li>
+          </ul>
         </li>
         <li class="last expanded">
           <span class="nolink">Support</span>
@@ -73,3 +83,5 @@
   </div>
 
 </header>
+
+<!-- START Promo banner -->{% include promo_banner.html %}<!-- END Promo banner -->

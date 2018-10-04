@@ -33,7 +33,7 @@ Once you have collected the credentials, all that is required is a single API ca
 
 ```
 curl --request POST \
-  --url https://{yourOktaDomain}.com/oauth2/default/v1/token \
+  --url https://{yourOktaDomain}/oauth2/default/v1/token \
   --header 'accept: application/json' \
   --header 'authorization: Basic MG9hYn...' \
   --header 'content-type: application/x-www-form-urlencoded' \
@@ -41,16 +41,16 @@ curl --request POST \
   rlnU9oZU4qWGrhQSM%3Dyd&scope=openid'
 ```
 
-> Important: The call to the `/token` endpoint requires authentication. In this case, it is a Basic Auth digest of the Client ID and Secret. You can find the client ID and secret in your application's General tab. For more on Basic Auth, please see [Token Authentication Methods](/docs/api/resources/oauth2.html#token-authentication-methods).
+> Important: The call to the `/token` endpoint requires authentication. In this case, it is a Basic Auth digest of the Client ID and Secret. You can find the client ID and secret in your application's General tab. For more on Basic Auth, please see [Token Authentication Methods](/docs/api/resources/oidc#token-authentication-methods).
 
 Note the parameters that are being passed:
 
 - `grant_type` is `password`, indicating that we are using the Resource Owner Password grant type.
 - `username` is the username of a user registered with Okta.
 - `password` is the password of a user registered with Okta.
-- `scope` must be at least `openid`. For more information about this, see the [Custom Authorization Server chapter](/authentication-guide/implementing-authentication/set-up-authz-server.html#create-scopes-optional).
+- `scope` must be at least `openid`. For more information about this, see the [Custom Authorization Server chapter](/authentication-guide/implementing-authentication/set-up-authz-server#create-scopes-optional).
 
-For more information on these parameters, see the [OAuth 2.0 API reference](/docs/api/resources/oauth2.html#request-a-token).
+For more information on these parameters, see the [OAuth 2.0 API reference](/docs/api/resources/oidc#token).
 
 If the credentials are valid, your application will receive back access and ID tokens:
 

@@ -1,11 +1,10 @@
 ---
 layout: docs_page
-title: Bring Your Own SAML App Certificate
+title: Upload Your Own Certificates for Outbound SAML Apps
 excerpt: How to use a custom SAML certificate for apps
 ---
 
-<a name="top"></a>
-## Bring Your Own SAML App Certificate
+# Upload Your Own SAML Certificates for Outbound SAML Apps
 
 Okta Admins can upload their own SAML certificates to sign the assertion for Outbound SAML apps and to sign the AuthNRequest and decrypt the assertion for Inbound SAML.
 
@@ -19,22 +18,22 @@ To use your own SAML certificate, update the key credential for the affected app
 
 The general procedure is the same for Outbound and Inbound SAML application; however, some of the api calls are different, as described in the steps below. The general procedure contains the following seven steps:
 
-  1. [List your apps](#step-1--list-your-apps)
-  2. [Generate a certificate signing request (CSR)](#step-2--generate-a-csr)
-  3. [Sign the CSR](#step-3--sign-the-csr)
-  4. [Publish the CSR](#step-4--publish-the-csr)
-  5. [Update the key credential for the app to specify the new certificate](#step-5--update-the-key-credential)
-  6. [Clone the certificate (optional)](#step-6--clone-the-certificate-optional)
-  7. [Upload the new certificate to the ISV](#step-7--upload-the-new-certificate-to-the-isv)
+  1. [List your apps](#step-1-list-your-apps)
+  2. [Generate a certificate signing request (CSR)](#step-2-generate-a-csr)
+  3. [Sign the CSR](#step-3-sign-the-csr)
+  4. [Publish the CSR](#step-4-publish-the-csr)
+  5. [Update the key credential for the app to specify the new certificate](#step-5-update-the-key-credential)
+  6. [Clone the certificate (optional)](#step-6-clone-the-certificate-optional)
+  7. [Upload the new certificate to the ISV](#step-7-upload-the-new-certificate-to-the-isv)
 
 > **Important:** In the third step, use your own process to sign the CSR. You can't move to step four until the process is completed.
 
-For information on using the Postman REST API test client for these steps, see [API Test Client](/docs/api/getting_started/api_test_client.html).
+For information on using the Postman REST API test client for these steps, see [Get Started with the Okta REST APIs](/code/rest/).
 
-#### Step 1 – List your apps
+#### Step 1: List your apps
 
-- For Outbound SAML, use the [/api/v1/apps API](/docs/api/resources/apps.html#list-applications) to return a list of all apps and collect the `id`, `name`, and `label` elements for each app to update.
-- For Inbound SAML, use the [/api/v1/idps API](/docs/api/resources/idps.html#list-identity-providers-with-defaults) to return a list of all identity providers and collect the full response for each IdP to update.
+- For Outbound SAML, use the [/api/v1/apps API](/docs/api/resources/apps#list-applications) to return a list of all apps and collect the `id`, `name`, and `label` elements for each app to update.
+- For Inbound SAML, use the [/api/v1/idps API](/docs/api/resources/idps#list-identity-providers-with-defaults) to return a list of all identity providers and collect the full response for each IdP to update.
 
 The following example shows a call for Outbound SAML apps.
 
@@ -96,7 +95,7 @@ Truncated Response:
   }
 ~~~
 
-#### Step 2 – Generate a CSR
+#### Step 2: Generate a CSR
 
 * Use the [/api/v1/apps/credentials/csrs/ API](#top) to return a list of all apps to use with Outbound SAML apps.
 * Use the [/api/v1/idps/credentials/csrs/ API](#top) to return a list of all IdPs to use with Inbound SAML apps.
@@ -130,7 +129,7 @@ Content-Type: application/json
 }
 
 201 Created
-Location: https://{yourOktaDomain}.com/api/v1/apps/00000id1U3iyFqLu0g4/credentials/csrs/abckutaSe7fZX0SwN1GqDApofgD1OW8g2B5l2azh000
+Location: https://{yourOktaDomain}/api/v1/apps/00000id1U3iyFqLu0g4/credentials/csrs/abckutaSe7fZX0SwN1GqDApofgD1OW8g2B5l2azh000
 
 {
   "id": "abckutaSe7fZX0SwN1GqDApofgD1OW8g2B5l2azh000",
@@ -139,7 +138,7 @@ Location: https://{yourOktaDomain}.com/api/v1/apps/00000id1U3iyFqLu0g4/credentia
   "kty": "RSA",
   "_links": {
     "self": {
-      "href": "https://{yourOktaDomain}.com/api/v1/apps/00000id1U3iyFqLu0g4/credentials/csrs/abckutaSe7fZX0SwN1GqDApofgD1OW8g2B5l2azh000",
+      "href": "https://{yourOktaDomain}/api/v1/apps/00000id1U3iyFqLu0g4/credentials/csrs/abckutaSe7fZX0SwN1GqDApofgD1OW8g2B5l2azh000",
       "hints": {
         "allow": [
           "GET",
@@ -148,7 +147,7 @@ Location: https://{yourOktaDomain}.com/api/v1/apps/00000id1U3iyFqLu0g4/credentia
       }
     },
     "publish": {
-      "href": "https://{yourOktaDomain}.com/api/v1/apps/00000id1U3iyFqLu0g4/credentials/csrs/abckutaSe7fZX0SwN1GqDApofgD1OW8g2B5l2azh000/lifecycle/publish",
+      "href": "https://{yourOktaDomain}/api/v1/apps/00000id1U3iyFqLu0g4/credentials/csrs/abckutaSe7fZX0SwN1GqDApofgD1OW8g2B5l2azh000/lifecycle/publish",
       "hints": {
         "allow": [
           "POST"
@@ -159,16 +158,16 @@ Location: https://{yourOktaDomain}.com/api/v1/apps/00000id1U3iyFqLu0g4/credentia
 }
 ~~~
 
-#### Step 3 – Sign the CSR
+#### Step 3: Sign the CSR
 
 Follow the third-party process that your company uses to sign the CSR. **You can't move to step four until the process is completed**, as the signed CSR is required to continue.
 
 **Note:** The CSR is generated in Base64 DER format. If your process requires a different format, convert it using OpenSSL or a third-party decoder. Free, third-party decoders are readily available.
 
-#### Step 4 – Publish the CSR
+#### Step 4: Publish the CSR
 
-- Use the [/api/v1/apps/credentials/csrs/:csrid/lifecycle/publish API](/docs/api/resources/apps.html#publish-csr-for-application) to publish the certificate for Outbound SAML apps.
-- Use the [/api/v1/idps/credentials/csrs/:csrid/lifecycle/publish API](/docs/api/resources/idps.html#publish-signing-csr-for-idp) to publish the certificate for Inbound SAML apps.
+- Use the [/api/v1/apps/credentials/csrs/${csrId}/lifecycle/publish API](/docs/api/resources/apps#publish-csr-for-application) to publish the certificate for Outbound SAML apps.
+- Use the [/api/v1/idps/credentials/csrs/${csrId}/lifecycle/publish API](/docs/api/resources/idps#publish-signing-csr-for-idp) to publish the certificate for Inbound SAML apps.
 
 Base64 encoding and both PEM and CER certificate formats are supported.
 
@@ -194,7 +193,7 @@ ZRUaagvFUo1EO9m1xnjpLDIa7+M=
 
 
 201 Created
-Location: https://{yourOktaDomain}.com/api/v1/apps/0oa1ysid1U3iyFqLu0g4/credentials/keys/ElsCzR8nbPamANBFu7QPRvtLD6Q3O1KQNJ92zkfFJNw
+Location: https://{yourOktaDomain}/api/v1/apps/0oa1ysid1U3iyFqLu0g4/credentials/keys/ElsCzR8nbPamANBFu7QPRvtLD6Q3O1KQNJ92zkfFJNw
 Content-Type: application/json;charset=UTF-8
 
 {
@@ -214,12 +213,12 @@ Content-Type: application/json;charset=UTF-8
 ~~~
 
 
-#### Step 5 – Update the key credential
+#### Step 5: Update the key credential
 
 Update the key credential for the app or IdP to specify the new signing Key ID.
 
-- For Outbound SAML, call the [/api/v1/apps/:aid API](/docs/api/resources/apps.html#update-application). Pass the app ID you obtained in step 1 in the URL. In the body, include the app name and the app label that you obtained in step 1 and the Key ID that you obtained in step 4.
-- For Inbound SAML, call the [/api/v1/idps/:id API](/docs/api/resources/idps.html#update-identity-provider). Pass the entire [identity provider](/docs/api/resources/idps.html#update-identity-provider) that you obtained in step 1 and use the Key ID value obtained in step 4. Partial updates are not supported by the `/api/v1/idps/:id API`.
+- For Outbound SAML, call the [Updating Application API](/docs/api/resources/apps#update-application). Pass the app ID you obtained in step 1 in the URL. In the body, include the app name and the app label that you obtained in step 1 and the Key ID that you obtained in step 4.
+- For Inbound SAML, call the [Update IdP API](/docs/api/resources/idps#update-identity-provider). Pass the entire [identity provider](/docs/api/resources/idps#update-identity-provider) that you obtained in step 1 and use the Key ID value obtained in step 4. Partial updates are not supported by the `Updated IdP API`.
 
 The following request is for Outbound SAML.
 
@@ -324,13 +323,13 @@ Content-Type: application/json
 
 ~~~
 
-#### Step 6 – Clone the certificate (optional)
+#### Step 6: Clone the certificate (optional)
 
 - To share the certificate you created across multiple apps, clone it with the
-[/api/v1/apps/:aid/credentials/keys/:kid/clone?targetAid=:targetAid API](/docs/api/resources/apps.html#clone-application-key-credential) using the key id you generated.
+[/api/v1/apps/${applicationId}/credentials/keys/${keyId}/clone?targetAid=${targetApplicationId} API](/docs/api/resources/apps#clone-application-key-credential) using the key `id` you generated.
 
 - To share the certificate you created across multiple Identity Providers, clone it with the
-[/api/v1/idps/:id/credentials/keys/:kid/clone?targetIdpId=:targetIdpId API](#top) using the Key Id you generated.
+[/api/v1/idps/${idpId}/credentials/keys/${keyId}/clone?targetIdpId=${targetIdpId} API](#top) using the key `id` you generated.
 
 Be sure to clone the certificate to every app or IdP with which you want to share it.
 
@@ -338,7 +337,7 @@ If the certificate you cloned from changes, you must repeat the cloning operatio
 
 **Important:** Sharing certificates is not a recommended security practice. This API is provided to support legacy use cases.
 
-#### Step 7 – Upload the new certificate to the ISV
+#### Step 7: Upload the new certificate to the ISV
 
 > After completing step 5, your users cannot access the SAML app or IdP until you complete this step.
 
@@ -346,10 +345,9 @@ If the certificate you cloned from changes, you must repeat the cloning operatio
 
 For Outbound SAML, complete the following four steps.
 
-1. In the Okta user interface, select **Applications** and choose your app.
+1. In the administrator UI, select **Applications** and choose your app.
 2. Select **Sign-On Options**.
 3. Click **View Setup Instructions**, as shown below. <br />{% img saml_setup_link.png alt:"Accessing SAML Setup Instructions" %}
 4. Perform the setup for your app again, using the instructions provided. During this setup, you will upload the certificate in a specified format, the metadata, or the certificate fingerprint.
 
 For Inbound SAML, follow the existing procedures for your setup.
-

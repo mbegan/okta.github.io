@@ -5,7 +5,7 @@ language: .NET
 integration: server
 ---
 
-# Add Okta to your .NET app
+# Add Okta authentication to your .NET app
 
 New to Okta? Our Quick Start Guide will walk you through adding user authentication to your .NET application in minutes.
 
@@ -16,19 +16,51 @@ New to Okta? Our Quick Start Guide will walk you through adding user authenticat
     </a>
   </li>
   <li>
-    <a href='https://github.com/oktadeveloper/okta-aspnetcore-mvc-example' class='code-button'>
-      <span class='fa fa-github'></span><span>ASP.NET Core 2.0 example app</span>
+    <a href='https://github.com/okta/samples-aspnetcore' class='code-button'>
+      <span class='fa fa-github'></span><span>ASP.NET Core examples</span>
+    </a>
+  </li>
+  <li>
+    <a href='https://github.com/okta/samples-aspnet' class='code-button'>
+      <span class='fa fa-github'></span><span>ASP.NET examples</span>
     </a>
   </li>
 </ul>
 
-## .NET SDK
+## ASP.NET Core packages
 
-Once your users can sign in to your app, use Okta's Management API and SDKs to configure resources and manage your users.
+Use our Okta ASP.NET Core middleware in your ASP.NET Core application.
 
 <ul class='code-list'>
   <li>
-    <span class='fa fa-archive'></span> <a href='https://www.nuget.org/packages/Okta.Sdk'>.NET SDK</a>
+    <span class='fa fa-archive'></span> <a href='https://www.nuget.org/packages/Okta.AspNetCore'>NuGet</a>
+  </li>
+  <li>
+    <span class='fa fa-github'></span> <a href='https://github.com/okta/okta-aspnet'>Source Code</a>
+  </li>
+</ul>
+
+## ASP.NET packages
+
+Use our Okta ASP.NET middleware in ASP.NET application.
+
+<ul class='code-list'>
+  <li>
+    <span class='fa fa-archive'></span> <a href='https://www.nuget.org/packages/Okta.AspNet'>NuGet</a>
+  </li>
+  <li>
+    <span class='fa fa-github'></span> <a href='https://github.com/okta/okta-aspnet'>Source Code</a>
+  </li>
+</ul>
+
+
+## .NET Management SDK
+
+Once your users can sign in to your app, use Okta's Management APIs to configure resources and manage your users. The .NET SDK makes calling Okta APIs from .NET code easy.
+
+<ul class='code-list'>
+  <li>
+    <span class='fa fa-archive'></span> <a href='https://www.nuget.org/packages/Okta.Sdk'>.NET SDK on NuGet</a>
   </li>
   <li>
     <span class='fa fa-github'></span> <a href='https://github.com/okta/okta-sdk-dotnet'>.NET SDK source code</a>
@@ -38,9 +70,6 @@ Once your users can sign in to your app, use Okta's Management API and SDKs to c
   </li>
 </ul>
 
-## More Resources
+## Guides
 
-<ul class='code-list'>
-  <li><span class='fa fa-github'></span> <a href='https://github.com/oktadeveloper/okta-aspnetcore-mvc-example'>ASP.NET Core 2.0 MVC example app</a></li>
-  <li><span class='code-icon info-16-gray'></span> <a href='/code/dotnet/jwt-validation.html'>.NET JWT validation guide</a></li>
-</ul>
+<p><a href='/code/dotnet/jwt-validation'>.NET JWT validation guide</a></p>

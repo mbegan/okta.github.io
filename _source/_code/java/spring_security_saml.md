@@ -20,8 +20,8 @@ This guide assumes that you are familiar
 with the basics of Java software development: editing text files,
 using the command line, and running Tomcat, Maven or Gradle.
 
-If you’re already familiar with Okta and Spring, you can skip to
-the section titled “Configuring Spring Security SAML to work with Okta”.
+If you're already familiar with Okta and Spring, you can skip to
+the section titled "Configuring Spring Security SAML to work with Okta".
 
 * Will be replaced with the ToC
 {:toc .list-unstyled .toc}
@@ -50,7 +50,7 @@ This section covers what you need to do to install and configure Tomcat from scr
 How to install the Spring Security SAML sample Okta application on Mac OS X:
 
 1. **Installing Tomcat**
-	- If it’s not already installed, install Tomcat with Homebrew using [these directions](https://github.com/mhulse/mhulse.github.io/wiki/Installing-Apache-Tomcat-using-Homebrew-on-OS-X-Yosemite)
+	- If it's not already installed, install Tomcat with Homebrew using [these directions](https://github.com/mhulse/mhulse.github.io/wiki/Installing-Apache-Tomcat-using-Homebrew-on-OS-X-Yosemite)
 
 
 2. **Downloading the Spring SAML Extension**
@@ -228,7 +228,7 @@ these steps, you'll have a working example of connecting Okta to Spring.
 	<bean class="org.opensaml.saml2.metadata.provider.HTTPMetadataProvider">
 	  <!-- URL containing the metadata -->
 	  <constructor-arg>
-		<!-- This URL should look something like this: https://{yourOktaDomain}.com/app/abc0defghijK1lmN23o4/sso/saml/metadata -->
+		<!-- This URL should look something like this: https://{yourOktaDomain}/app/abc0defghijK1lmN23o4/sso/saml/metadata -->
 		<value type="java.lang.String">{metadata-url}</value>
 	  </constructor-arg>
 	  <!-- Timeout for metadata loading in ms -->
@@ -298,4 +298,4 @@ At this point you should be familiar with setting up SAML enabled application to
 
 After you have Okta working with the example Spring Security SAML application, the next step is to take the example code and move it to your production application. The specifics of how this works is different depending on how your application is set up. Pay special attention to the `securityContext.xml` which allows you to add more IDPs to the app as well as control page redirects. Before any changes are made to the `securityContext.xml` file, you should consider reading the [Spring Security SAML reference documents](http://docs.spring.io/spring-security-saml/docs/1.0.x/reference/html/) which provides a detailed overview of all the components and features of Spring Security SAML.
 
-If you want to learn more about configuring in SAML and what to consider when writing a SAML application, Okta's in-depth [SAML guidance](/docs/getting_started/saml_guidance.html) is great place to learn more.
+If you want to learn more about configuring in SAML and what to consider when writing a SAML application, Okta's in-depth [SAML guidance](/docs/getting_started/saml_guidance) is great place to learn more.

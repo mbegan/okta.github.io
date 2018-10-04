@@ -1,9 +1,9 @@
-# -- Okta API Release Notes
-- section: platform-release-notes/platform-release-notes.html
-  slug: Okta API Release Notes
-  title: Okta API Release Notes
+# -- Okta API Products Change Log
+- section: change-log
+  slug: Change Log
+  title: Change Log
   pages:
-    - platform-release-notes
+    - index
 
 # -- APIS
 - section: api/getting_started
@@ -14,34 +14,39 @@
     - error_codes
     - getting_a_token
     - enabling_cors
-    - api_test_client
     - okta_expression_lang
 
 - section: api/resources
   slug: api
-  title: Authentication
+  title: Sign in Your Users
   pages:
     - authn
-    - oauth2
     - oidc
-    - social_authentication
-    - sessions
-    - okta_signin_widget
-
 
 - section: api/resources
   slug: api
-  title: Resources
+  title: Manage Okta Resources
   pages:
-    - users
+    - apps
+    - authorization-servers
+    - events
+    - event-types
+    - oauth-clients
+    - factor_admin
     - factors
     - groups
-    - apps
-    - schemas
     - idps
+    - linked-objects
+    - policy
     - roles
-    - events
+    - schemas
+    - sessions
+    - system_log
     - templates
+    - tokens
+    - trusted-origins
+    - users
+    - zones
 
 # -- GUIDES
 - section: guides
@@ -52,6 +57,7 @@
     - okta_mobile_connect
     - okta_sign-in_widget
     - add_mfa
+    - events-api-migration
 
 - section: guides
   slug: guides

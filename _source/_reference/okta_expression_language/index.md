@@ -2,17 +2,17 @@
 layout: docs_page
 weight: 5
 title: Okta Expression Language
-excerpt: The features and syntax of Okta's Expression Language which can be used throughout the Okta Admin Console and API.
+excerpt: Read and transform attributes in our APIs and admin UI.
 redirect_from:
-    - "/docs/getting_started/okta_expression_lang.html"
-    - "/docs/api/getting_started/okta_expression_lang.html"
+    - "/docs/getting_started/okta_expression_lang"
+    - "/docs/api/getting_started/okta_expression_lang"
 ---
 
 # Overview
 
 Expressions allow you to reference, transform and combine attributes before you store them on a user profile or before passing them to an application for authentication or provisioning.  For example, you might use a custom expression to create a username by stripping @company.com from an email address.  Or you might combine `firstName` and `lastName` attributes into a single `displayName` attribute.
 
-This document details the features and syntax of Okta's Expression Language which can be used throughout the Okta Admin Console and API. This document will be updated over time as new capabilities are added to the language.  Okta's expression language is based on [SpEL](http://docs.spring.io/spring/docs/3.0.x/reference/expressions.html) and uses a subset of functionalities offered by SpEL.
+This document details the features and syntax of Okta's Expression Language which can be used throughout the administrator UI and API. This document will be updated over time as new capabilities are added to the language.  Okta's expression language is based on [SpEL](http://docs.spring.io/spring/docs/3.0.x/reference/expressions.html) and uses a subset of functionalities offered by SpEL.
 
 ## Referencing User Attributes
 When you create an Okta expression, you can reference any attribute that lives on an Okta user profile or App user profile.
@@ -147,53 +147,45 @@ For more information on these codes, see the [ISO 3166-1 online lookup tool](htt
 
 ### Group Functions
 
-Function  | Return Type | Example | Output
+Group functions return either an array of groups or **True** or **False**.
+
+Function  | Return Type | Example |
 --------- | ----------- | ------- | -------
-`isMemberOfGroupName` | Boolean | `isMemberOfGroupName("group1")` | **True**, if the user under consideration is a member of *group1'; otherwise, **False**.
-`isMemberOfGroup` | Boolean | `isMemberOfGroup("groupId")` | **True**, if the user under consideration is a member of group with id *groupId*; otherwise,  **False**.
-`isMemberOfAnyGroup` | Boolean | `isMemberOfAnyGroup("groupId1", "groupId2", "groupId3")` | **True**, if the user under consideration is a member of any groups with ids *groupId1*, *groupId2* or *groupId3*; otherwise **False**.
-`isMemberOfGroupNameStartsWith` | Boolean | `isMemberOfGroupNameStartsWith("San Fr")` | **True**, if the user under consideration is a member of any groups with names that starts with *San Fr*; otherwise,  **False**.
-`isMemberOfGroupNameContains` | Boolean | `isMemberOfGroupNameContains("admin")` | **True**, if the user under consideration is a member of any groups with names that contains *admin*; otherwise,  **False**.
-`isMemberOfGroupNameRegex` | Boolean | `isMemberOfGroupNameRegex("/.*admin.*")` | **True**, if the user under consideration is a member of any groups with names that contain *admin*; otherwise,  **False**.
-`getFilteredGroups` | Array | `getFilteredGroups({"00gml2xHE3RYRx7cM0g3"}, "group.name", 40)` | Array of groups
+`getFilteredGroups` | Array | `getFilteredGroups({"00gml2xHE3RYRx7cM0g3"}, "group.name", 40)` |
+`Groups.contains` | Array | `contains(app_type/app_instance_id, pattern, limit)` |
+`Groups.startsWith` | Array | `startsWith(app_type/app_instance_id, pattern, limit)` |
+`Groups.endsWith` | Array | `endsWith(app_type/app_instance_id, pattern, limit)` |
+`isMemberOfGroupName` | Boolean | `isMemberOfGroupName("group1")` |
+`isMemberOfGroup` | Boolean | `isMemberOfGroup("groupId")` |
+`isMemberOfAnyGroup` | Boolean | `isMemberOfAnyGroup("groupId1", "groupId2", "groupId3")` |
+`isMemberOfGroupNameStartsWith` | Boolean | `isMemberOfGroupNameStartsWith("San Fr")` |
+`isMemberOfGroupNameContains` | Boolean | `isMemberOfGroupNameContains("admin")` |
+`isMemberOfGroupNameRegex` | Boolean | `isMemberOfGroupNameRegex("/.*admin.*")` |
 
-##### getFilteredGroups Details
+For an example using group functions and for more information on using group functions for dynamic and static whitelists, see [Create an ID Token or Access Token Containing a Groups Claim](/docs/how-to/creating-token-with-groups-claim).
 
-`getFilteredGroups` returns all groups contained in a specified list, the whitelist, of which the user is a member. The groups are returned in a format specified by the `group_expression` parameter. You must specify the maximum number of groups to return. The format of this EL function is `getFilteredGroups( whitelist, group_expression, limit)`.
+### Linked Object Function
 
-You can use this function anywhere to get a list of groups of which the current user is a member, incuding both user groups and app groups that originate from sources outside Okta, such as from Active Directory and Workday. Additionally, you can use this combined, custom-formatted list for customizable claims into Access and ID Tokens that drive authorization flows.
+{% api_lifecycle ea %}
 
-This function takes Okta EL expressions for all parameters that evaluate to the correct data type. With these expressions you can create complex definitions for the whitelist, the group format, and for the number of groups to return that can include `if` logic and customized formatting.
+Use this function to retrieve properties about the user identified with the specified `primary` relationship. You can optionally specify an app.
 
-| Parameter        | Description                                                                                                                            | Nullable |
-|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------|:---------|
-| whitelist        | Valid Okta EL expression that evaluates to a string array of group ids                                                                 | FALSE    |
-| group_expression | Valid Okta EL expression that evaluates to a string to use to evaluate the group. This string must also be a valid Okta EL expression. | FALSE    |
-| limit            | Valid Okta EL expression that evaluates to an integer between 1 and 100, inclusive to indicate the maximum number of groups to return  | FALSE    |
+* Function: `user.getLinkedObject().$attribute`
+    * Parameters: (String primaryName, String userAttribute)
+    * Return Type: User
+    * Example: `user.getLinkedObject("manager").lastName`
+    * Example Result: `Gates`
 
-All parameters must be valid Okta EL expressions that evaluate as described above. Okta EL expressions can be comprised of strings, integers, arrays, etc.
-
-The string produced by the `group_expression` parameter usually contains attributes and objects from the [Groups API](/docs/api/resources/groups.html), although it is not limited to those attributes and objects. Attributes and objects listed in the [Group Attributes](/docs/api/resources/groups.html#group-attributes) section of the Groups API can be any of the following: `id`, `status`, `name`, `description`, `objectClass`, and the `profile` object that contains the `groupType`, `samAccountName`, `objectSid`, `groupScope`, `windowsDomainQualifiedName`, `dn`, and `externalID` attributes for groups that come from apps such as Active Directory.
-
-The `whitelist` parameter must evaluate to a list of group ids that is returned from the [Groups API](/docs/api/resources/groups.html). If the user is not member of a group in the whitelist, the group is ignored.
-
-**Parameter Examples**
-
-* whitelist<br />
-  Array: `{"00gn335BVurvavwEEL0g3", "00gnfg5BVurvavAAEL0g3"}`<br />
-  Array variable: `app.profile.groups.whitelist`
-* group_expression<br />
-  Attribute name: `"group.id"`<br />
-  Okta EL string containing an if condition: `"(group.objectClass[0] == 'okta:windows_security_principal') ? 'AD: ' + group.profile.windowsDomainQualifiedName : 'Okta: ' + group.name"`<br /><br />If *okta:windows_security_principal* is true for
-  a group, the function returns the `windowsDomainQualifiedName` prefixed with `AD:`; otherwise, the function returns the group name prefixed with `Okta:`.
-* limit<br />
-   Integer between 1 and 100, inclusive; for example: `50`.<br />
-   Okta EL expression containing a condition that evaluates to an integer: `app.profile.maxLimit < 100 ? app.profile.maxLimit : 100`.<br /><br /> If the maximum group limit in the profile is less than 100, return that number of groups; otherwise, return a maximum of 100 groups. `Note:` If there are more groups returned than the specified limit, an error is returned.
+* Function: `user.getLinkedObject().appuser().$attribute`
+    * Parameters: (String primaryName) (String appName) (String userAttribute)
+    * Return type: User
+    * Example: `user.getLinkedObject("manager").appuser("Salesforce").lastName
+    * Example Result: `Benioff`
 
 ### Time Functions
 
-| Function                    | Input Parameter Signature          | Return Type                              | Example                                                                                                            | Output                                                                                                  |
-|:----------------------------|:-----------------------------------|:-----------------------------------------|:-------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------|
+| Function | Input Parameter Signature | Return Type | Example  | Output  |
+| :----------- | :--------------------------| :--------------- |:-----|:---|
 | `Time.now`                  | (String timeZoneId, String format) | String                                   | `Time.now()`                                                                                                       | 2015-07-31T17:18:37.979Z (Current time, UTC format)                                                     |
 |                             |                                    | `Time.now("EST")`                        | 2015-07-31T13:30:49.964-04:00 (Specified time zone)                                                                |                                                                                                         |
 |                             |                                    | `Time.now("EST", "YYYY-MM-dd HH:mm:ss")` | 2015-07-31 13:36:48 (Specified time zone and format, military time)                                                |                                                                                                         |
@@ -204,17 +196,10 @@ The `whitelist` parameter must evaluate to a list of group ids that is returned 
 | `Time.fromIso8601ToUnix`    | (String time)                      | String                                   | ISO 8601 timestamp time as a string                                                                                | The passed-in time expressed in Unix timestamp format.                                                  |
 | `Time.fromIso8601ToString`  | (String time, String format)       | String                                   | ISO 8601 timestamp time, to convert to format using the same Joda time format semantics as fromStringToIso8601     | The passed-in time expressed informat format.                                                           |
 
->Both input parameters are optional for the Time.now function. The time zone ID supports both new and old style formats, listed below. The third example for
+>Note: Both input parameters are optional for the Time.now function. The time zone ID supports both new and old style formats, listed below. The third example for
 the Time.now function shows how to specify the military time format.
 
-##### Time Zone IDs
-
-The following old style IDs are supported: GMT, WET, CET, MET, ECT, EET, MIT, HST, AST, PST, MST, PNT, CST, EST, IET, PRT, CNT, AGT, BET, ART, CAT, EAT, NET, PLT, IST, BST, VST, CTT, JST, ACT, AET, SST, NST.
-
-The following new style IDs are supported: UTC, WET, CET, CET, CET, EET, Pacific/Apia, Pacific/Honolulu, America/Anchorage, America/Los_Angeles, America/Denver, America/Phoenix, America/Chicago,
-America/New_York, America/Indiana/Indianapolis, America/Puerto_Rico, America/St_Johns, America/Argentina/Buenos_Aires, America/Sao_Paulo, Africa/Cairo,
-Africa/Harare, Africa/Addis_Ababa, Asia/Yerevan, Asia/Karachi, Asia/Kolkata, Asia/Dhaka, Asia/Ho_Chi_Minh, Asia/Shanghai, Asia/Tokyo, Australia/Darwin,
-Australia/Sydney, Pacific/Guadalcanal, Pacific/Auckland.
+Okta supports the use of the time zone IDs and aliases listed in [the Time Zone Codes table](#appendix-time-zone-codes).
 
 ### Manager/Assistant Functions
 
@@ -225,8 +210,11 @@ Function  | Description | Example
 `getAssistantUser(assistantSource).$attribute` | Gets the assistant's Okta user attribute values. | `getAssistantUser("active_directory").firstName`
 `getAssistantAppUser(assistantSource, attributeSource).$attribute` | Gets the assistant's app user attribute values for the app user of any appinstance. | `getAssistantAppUser("active_directory", "google").firstName`
 
-> Pass the correct **app name** for the *managerSource*, *assistantSource*, and *attributeSource* parameters.<br />
-> Note: At this time, only **active_directory** is supported for *managerSource* and *assistantSource*.
+The following should be noted about these functions:
+
+* Be sure to pass the correct App name for the `managerSource`, `assistantSource`, and `attributeSource` parameters.<br />
+* At this time, `active_directory` is the only supported value for `managerSource` and `assistantSource`.
+* Calling the `getManagerUser("active_directory")` function will not trigger a user profile update after the manager was changed.
 
 ### Directory and Workday Functions
 
@@ -345,3 +333,441 @@ Email Domain + Lowercase First Initial and Lastname with Separator | `toUpperCas
 Static Domain + Email Prefix with Separator | `"XDOMAIN\" + toLowerCase(substring( user.firstName, 0, 1)) + toLowerCase(user.lastName)` | XDOMAIN\wchurchill | Add "XDOMAIN" string. Append a backslash "\" character. Obtain the Firstname value. From result, retrieve characters greater than position 0 thru position 1, including position 1. Convert it to lowercase. Obtain the Lastname value. Convert it to lowercase.
 Workday ID | `hasWorkdayUser() ? findWorkdayUser().employeeID : null` | 123456 | Check if user has a Workday assignment, and if so, return their Workday employee ID.
 Active Directory UPN | `hasDirectoryUser() ? findDirectoryUser().managerUPN : null` | bob@okta.com | Check if user has an Active Directory assignment, and if so, return their Active Directory manager UPN.
+
+## Appendix: Time Zone Codes
+
+Okta supports the use of the following time zone codes:
+
+| Standard Offset | Canonical ID | Aliases |
+| --------------------: | :----------------- | --------- |
+| -12:00 | Etc/GMT+12 | |
+| -11:00 | Etc/GMT+11 | |
+| -11:00 | Pacific/Apia | |
+| -11:00 | Pacific/Midway | |
+| -11:00 | Pacific/Niue | |
+| -11:00 | Pacific/Pago_Pago | Pacific/Samoa, US/Samoa |
+| -10:00 | America/Adak | America/Atka, US/Aleutian |
+| -10:00 | Etc/GMT+10 | |
+| -10:00 | HST | |
+| -10:00 | Pacific/Fakaofo | |
+| -10:00 | Pacific/Honolulu | US/Hawaii |
+| -10:00 | Pacific/Johnston | |
+| -10:00 | Pacific/Rarotonga | |
+| -10:00 | Pacific/Tahiti | |
+| -09:30 | Pacific/Marquesas | |
+| -09:00 | America/Anchorage | US/Alaska |
+| -09:00 | America/Juneau | |
+| -09:00 | America/Nome | |
+| -09:00 | America/Yakutat | |
+| -09:00 | Etc/GMT+9 | |
+| -09:00 | Pacific/Gambier | |
+| -08:00 | America/Dawson | |
+| -08:00 | America/Los_Angeles | US/Pacific, US/Pacific-New |
+| -08:00 | America/Santa_Isabel | |
+| -08:00 | America/Tijuana | America/Ensenada, Mexico/BajaNorte |
+| -08:00 | America/Vancouver | Canada/Pacific |
+| -08:00 | America/Whitehorse | Canada/Yukon |
+| -08:00 | Etc/GMT+8 | |
+| -08:00 | PST8PDT | |
+| -08:00 | Pacific/Pitcairn | |
+| -07:00 | America/Boise | |
+| -07:00 | America/Cambridge_Bay | |
+| -07:00 | America/Chihuahua | |
+| -07:00 | America/Dawson_Creek | |
+| -07:00 | America/Denver | America/Shiprock, Navajo, US/Mountain |
+| -07:00 | America/Edmonton | Canada/Mountain |
+| -07:00 | America/Hermosillo | |
+| -07:00 | America/Inuvik | |
+| -07:00 | America/Mazatlan | Mexico/BajaSur |
+| -07:00 | America/Ojinaga | |
+| -07:00 | America/Phoenix | US/Arizona |
+| -07:00 | America/Yellowknife | |
+| -07:00 | Etc/GMT+7 | |
+| -07:00 | MST | |
+| -07:00 | MST7MDT | |
+| -06:00 | America/Bahia_Banderas |
+| -06:00 | America/Belize | |
+| -06:00 | America/Cancun | |
+| -06:00 | America/Chicago | US/Central |
+| -06:00 | America/Costa_Rica | |
+| -06:00 | America/El_Salvador | |
+| -06:00 | America/Guatemala | |
+| -06:00 | America/Indiana/Knox | America/Knox_IN, US/Indiana-Starke |
+| -06:00 | America/Indiana/Tell_City | |
+| -06:00 | America/Managua | |
+| -06:00 | America/Matamoros | |
+| -06:00 | America/Menominee | |
+| -06:00 | America/Merida | |
+| -06:00 | America/Mexico_City | Mexico/General |
+| -06:00 | America/Monterrey | |
+| -06:00 | America/North_Dakota/Center | |
+| -06:00 | America/North_Dakota/New_Salem | |
+| -06:00 | America/Rainy_River | |
+| -06:00 | America/Rankin_Inlet | |
+| -06:00 | America/Regina | Canada/East-Saskatchewan, Canada/Saskatchewan |
+| -06:00 | America/Swift_Current | |
+| -06:00 | America/Tegucigalpa | |
+| -06:00 | America/Winnipeg | Canada/Central |
+| -06:00 | CST6CDT | |
+| -06:00 | Etc/GMT+6 | |
+| -06:00 | Pacific/Easter | Chile/EasterIsland |
+| -06:00 | Pacific/Galapagos | |
+| -05:00 | America/Atikokan | America/Coral_Harbour |
+| -05:00 | America/Bogota | |
+| -05:00 | America/Cayman | |
+| -05:00 | America/Detroit | US/Michigan |
+| -05:00 | America/Grand_Turk | |
+| -05:00 | America/Guayaquil | |
+| -05:00 | America/Havana | Cuba |
+| -05:00 | America/Indiana/Indianapolis | America/Fort_Wayne, America/Indianapolis US/East-Indiana |
+| -05:00 | America/Indiana/Marengo | |
+| -05:00 | America/Indiana/Petersburg | |
+| -05:00 | America/Indiana/Vevay | |
+| -05:00 | America/Indiana/Vincennes | |
+| -05:00 | America/Indiana/Winamac | |
+| -05:00 | America/Iqaluit | |
+| -05:00 | America/Jamaica | Jamaica
+| -05:00 | America/Kentucky/Louisville | America/Louisville |
+| -05:00 | America/Kentucky/Monticello | |
+| -05:00 | America/Lima | |
+| -05:00 | America/Montreal | |
+| -05:00 | America/Nassau | |
+| -05:00 | America/New_York | US/Eastern |
+| -05:00 | America/Nipigon | |
+| -05:00 | America/Panama | |
+| -05:00 | America/Pangnirtung | |
+| -05:00 | America/Port-au-Prince | |
+| -05:00 | America/Resolute | |
+| -05:00 | America/Thunder_Bay | |
+| -05:00 | America/Toronto | Canada/Eastern |
+| -05:00 | EST | |
+| -05:00 | EST5EDT | |
+| -05:00 | Etc/GMT+5 | |
+| -04:30 | America/Caracas | |
+| -04:00 | America/Anguilla | |
+| -04:00 | America/Antigua | |
+| -03:00 | America/Argentina/San_Luis | |
+| -04:00 | America/Aruba | |
+| -04:00 | America/Asuncion | |
+| -04:00 | America/Barbados | |
+| -04:00 | America/Blanc-Sablon | |
+| -04:00 | America/Boa_Vista | |
+| -04:00 | America/Campo_Grande | |
+| -04:00 | America/Cuiaba | |
+| -04:00 | America/Curacao | |
+| -04:00 | America/Dominica | |
+| -04:00 | America/Eirunepe | |
+| -04:00 | America/Glace_Bay | |
+| -04:00 | America/Goose_Bay | |
+| -04:00 | America/Grenada | |
+| -04:00 | America/Guadeloupe | America/Marigot, America/St_Barthelemy |
+| -04:00 | America/Guyana | |
+| -04:00 | America/Halifax | Canada/Atlantic |
+| -04:00 | America/La_Paz | |
+| -04:00 | America/Manaus | Brazil/West |
+| -04:00 | America/Martinique | |
+| -04:00 | America/Moncton | |
+| -04:00 | America/Montserrat | |
+| -04:00 | America/Port_of_Spain | |
+| -04:00 | America/Porto_Velho | |
+| -04:00 | America/Puerto_Rico | |
+| -04:00 | America/Rio_Branco | America/Porto_Acre, Brazil/Acre |
+| -04:00 | America/Santiago | Chile/Continental |
+| -04:00 | America/Santo_Domingo | |
+| -04:00 | America/St_Kitts | |
+| -04:00 | America/St_Lucia | |
+| -04:00 | America/St_Thomas | America/Virgin |
+| -04:00 | America/St_Vincent | |
+| -04:00 | America/Thule | |
+| -04:00 | America/Tortola | |
+| -04:00 | Antarctica/Palmer | |
+| -04:00 | Atlantic/Bermuda | |
+| -04:00 | Atlantic/Stanley | |
+| -04:00 | Etc/GMT+4 | |
+| -03:30 | America/St_Johns | Canada/Newfoundland |
+| -03:00 | America/Araguaina | |
+| -03:00 | America/Argentina/Buenos_Aires | America/Buenos_Aires |
+| -03:00 | America/Argentina/Catamarca | America/Argentina/ComodRivadavia, America/Catamarca |
+| -03:00 | America/Argentina/Cordoba | America/Cordoba, America/Rosario |
+| -03:00 | America/Argentina/Jujuy | America/Jujuy |
+| -03:00 | America/Argentina/La_Rioja | |
+| -03:00 | America/Argentina/Mendoza | America/Mendoza |
+| -03:00 | America/Argentina/Rio_Gallegos | |
+| -03:00 | America/Argentina/Salta | |
+| -03:00 | America/Argentina/San_Juan | |
+| -03:00 | America/Argentina/Tucuman | |
+| -03:00 | America/Argentina/Ushuaia | |
+| -03:00 | America/Bahia | |
+| -03:00 | America/Belem | |
+| -03:00 | America/Cayenne | |
+| -03:00 | America/Fortaleza | |
+| -03:00 | America/Godthab | |
+| -03:00 | America/Maceio | |
+| -03:00 | America/Miquelon | |
+| -03:00 | America/Montevideo | |
+| -03:00 | America/Paramaribo | |
+| -03:00 | America/Recife | |
+| -03:00 | America/Santarem | |
+| -03:00 | America/Sao_Paulo | Brazil/East |
+| -03:00 | Antarctica/Rothera | |
+| -03:00 | Etc/GMT+3 | |
+| -02:00 | America/Noronha | Brazil/DeNoronha |
+| -02:00 | Atlantic/South_Georgia | |
+| -02:00 | Etc/GMT+2 | |
+| -01:00 | America/Scoresbysund | |
+| -01:00 | Atlantic/Azores | |
+| -01:00 | Atlantic/Cape_Verde | |
+| -01:00 | Etc/GMT+1 | |
+| +00:00 | Africa/Abidjan | |
+| +00:00 | Africa/Accra | |
+| +00:00 | Africa/Bamako | Africa/Timbuktu |
+| +00:00 | Africa/Banjul | |
+| +00:00 | Africa/Bissau | |
+| +00:00 | Africa/Casablanca | |
+| +00:00 | Africa/Conakry | |
+| +00:00 | Africa/Dakar | |
+| +00:00 | Africa/El_Aaiun |
+| +00:00 | Africa/Freetown |
+| +00:00 | Africa/Lome |
+| +00:00 | Africa/Monrovia |
+| +00:00 | Africa/Nouakchott |
+| +00:00 | Africa/Ouagadougou |
+| +00:00 | Africa/Sao_Tome |
+| +00:00 | America/Danmarkshavn |
+| +00:00 | Atlantic/Canary |
+| +00:00 | Atlantic/Faroe | Atlantic/Faeroe |
+| +00:00 | Atlantic/Madeira |
+| +00:00 | Atlantic/Reykjavik | Iceland |
+| +00:00 | Atlantic/St_Helena |
+| +00:00 | Etc/GMT | Etc/GMT+0, Etc/GMT-0, Etc/GMT0, Etc/Greenwich, GMT, GMT+0, GMT-0, GMT0, Greenwich |
+| +00:00 | Etc/UCT | UCT |
+| +00:00 | Etc/UTC | Etc/Universal, Etc/Zulu, Universal, Zulu |
+| +00:00 | Europe/Dublin | Eire |
+| +00:00 | Europe/Lisbon | Portugal |
+| +00:00 | Europe/London | Europe/Belfast, Europe/Guernsey, Europe/Isle_of_Man, Europe/Jersey, GB, GB-Eire |
+| +00:00 | UTC | |
+| +00:00 | WET | |
+| +01:00 | Africa/Algiers | |
+| +01:00 | Africa/Bangui | |
+| +01:00 | Africa/Brazzaville | |
+| +01:00 | Africa/Ceuta | |
+| +01:00 | Africa/Douala | |
+| +01:00 | Africa/Kinshasa | |
+| +01:00 | Africa/Lagos | |
+| +01:00 | Africa/Libreville | |
+| +01:00 | Africa/Luanda | |
+| +01:00 | Africa/Malabo | |
+| +01:00 | Africa/Ndjamena | |
+| +01:00 | Africa/Niamey | |
+| +01:00 | Africa/Porto-Novo | |
+| +01:00 | Africa/Tunis | |
+| +01:00 | Africa/Windhoek | |
+| +01:00 | CET | |
+| +01:00 | Etc/GMT-1 | |
+| +01:00 | Europe/Amsterdam | |
+| +01:00 | Europe/Andorra | |
+| +01:00 | Europe/Belgrade | Europe/Ljubljana, Europe/Podgorica, Europe/Sarajevo, Europe/Skopje, Europe/Zagreb |
+| +01:00 | Europe/Berlin | |
+| +01:00 | Europe/Brussels | |
+| +01:00 | Europe/Budapest | |
+| +01:00 | Europe/Copenhagen | |
+| +01:00 | Europe/Gibraltar | |
+| +01:00 | Europe/Luxembourg | |
+| +01:00 | Europe/Madrid | |
+| +01:00 | Europe/Malta | |
+| +01:00 | Europe/Monaco | |
+| +01:00 | Europe/Oslo | Arctic/Longyearbyen, Atlantic/Jan_Mayen |
+| +01:00 | Europe/Paris | |
+| +01:00 | Europe/Prague | Europe/Bratislava |
+| +01:00 | Europe/Rome | Europe/San_Marino, Europe/Vatican |
+| +01:00 | Europe/Stockholm | |
+| +01:00 | Europe/Tirane | |
+| +01:00 | Europe/Vaduz | |
+| +01:00 | Europe/Vienna | |
+| +01:00 | Europe/Warsaw | Poland |
+| +01:00 | Europe/Zurich | |
+| +01:00 | MET | |
+| +02:00 | Africa/Blantyre | |
+| +02:00 | Africa/Bujumbura | |
+| +02:00 | Africa/Cairo | Egypt
+| +02:00 | Africa/Gaborone | |
+| +02:00 | Africa/Harare | |
+| +02:00 | Africa/Johannesburg | |
+| +02:00 | Africa/Kigali | |
+| +02:00 | Africa/Lubumbashi | |
+| +02:00 | Africa/Lusaka | |
+| +02:00 | Africa/Maputo | |
+| +02:00 | Africa/Maseru | |
+| +02:00 | Africa/Mbabane | |
+| +02:00 | Africa/Tripoli | Libya
+| +02:00 | Asia/Amman | |
+| +02:00 | Asia/Beirut | |
+| +02:00 | Asia/Damascus | |
+| +02:00 | Asia/Gaza | |
+| +02:00 | Asia/Jerusalem | Asia/Tel_Aviv, Israel |
+| +02:00 | Asia/Nicosia | Europe/Nicosia |
+| +02:00 | EET | |
+| +02:00 | Etc/GMT-2 | |
+| +02:00 | Europe/Athens | |
+| +02:00 | Europe/Bucharest | |
+| +02:00 | Europe/Chisinau | Europe/Tiraspol |
+| +02:00 | Europe/Helsinki | Europe/Mariehamn |
+| +02:00 | Europe/Istanbul | Asia/Istanbul, Turkey |
+| +02:00 | Europe/Kaliningrad | |
+| +02:00 | Europe/Kiev | |
+| +02:00 | Europe/Minsk | |
+| +02:00 | Europe/Riga | |
+| +02:00 | Europe/Simferopol | |
+| +02:00 | Europe/Sofia | |
+| +02:00 | Europe/Tallinn | |
+| +02:00 | Europe/Uzhgorod | |
+| +02:00 | Europe/Vilnius | |
+| +02:00 | Europe/Zaporozhye | |
+| +03:00 | Africa/Addis_Ababa | |
+| +03:00 | Africa/Asmara | Africa/Asmera |
+| +03:00 | Africa/Dar_es_Salaam | |
+| +03:00 | Africa/Djibouti | |
+| +03:00 | Africa/Kampala | |
+| +03:00 | Africa/Khartoum | |
+| +03:00 | Africa/Mogadishu | |
+| +03:00 | Africa/Nairobi | |
+| +03:00 | Antarctica/Syowa | |
+| +03:00 | Asia/Aden | |
+| +03:00 | Asia/Baghdad | |
+| +03:00 | Asia/Bahrain | |
+| +03:00 | Asia/Kuwait | |
+| +03:00 | Asia/Qatar | |
+| +03:00 | Asia/Riyadh | |
+| +03:00 | Etc/GMT-3 | |
+| +03:00 | Europe/Moscow | W-SU |
+| +03:00 | Europe/Samara | |
+| +03:00 | Europe/Volgograd | |
+| +03:00 | Indian/Antananarivo | |
+| +03:00 | Indian/Comoro | |
+| +03:00 | Indian/Mayotte | |
+| +03:30 | Asia/Tehran | Iran |
+| +04:00 | Asia/Baku | |
+| +04:00 | Asia/Dubai | |
+| +04:00 | Asia/Muscat | |
+| +04:00 | Asia/Tbilisi | |
+| +04:00 | Asia/Yerevan | |
+| +04:00 | Etc/GMT-4 | |
+| +04:00 | Indian/Mahe | |
+| +04:00 | Indian/Mauritius | |
+| +04:00 | Indian/Reunion | |
+| +04:30 | Asia/Kabul | |
+| +05:00 | Antarctica/Mawson | |
+| +05:00 | Asia/Aqtau | |
+| +05:00 | Asia/Aqtobe | |
+| +05:00 | Asia/Ashgabat | Asia/Ashkhabad |
+| +05:00 | Asia/Dushanbe | |
+| +05:00 | Asia/Karachi | |
+| +05:00 | Asia/Oral | |
+| +05:00 | Asia/Samarkand | |
+| +05:00 | Asia/Tashkent | |
+| +05:00 | Asia/Yekaterinburg | |
+| +05:00 | Etc/GMT-5 | |
+| +05:00 | Indian/Kerguelen | |
+| +05:00 | Indian/Maldives | |
+| +05:30 | Asia/Colombo | |
+| +05:30 | Asia/Kolkata | Asia/Calcutta |
+| +05:45 | Asia/Kathmandu | Asia/Katmandu |
+| +06:00 | Antarctica/Vostok | |
+| +06:00 | Asia/Almaty | |
+| +06:00 | Asia/Bishkek | |
+| +06:00 | Asia/Dhaka | Asia/Dacca |
+| +06:00 | Asia/Novokuznetsk | |
+| +06:00 | Asia/Novosibirsk | |
+| +06:00 | Asia/Omsk | |
+| +06:00 | Asia/Qyzylorda | |
+| +06:00 | Asia/Thimphu | Asia/Thimbu |
+| +06:00 | Etc/GMT-6 | |
+| +06:00 | Indian/Chagos | |
+| +06:30 | Asia/Rangoon | |
+| +06:30 | Indian/Cocos | |
+| +07:00 | Antarctica/Davis | |
+| +07:00 | Asia/Bangkok | |
+| +07:00 | Asia/Ho_Chi_Minh | Asia/Saigon |
+| +07:00 | Asia/Hovd | |
+| +07:00 | Asia/Jakarta | |
+| +07:00 | Asia/Krasnoyarsk | |
+| +07:00 | Asia/Phnom_Penh | |
+| +07:00 | Asia/Pontianak | |
+| +07:00 | Asia/Vientiane | |
+| +07:00 | Etc/GMT-7 | |
+| +07:00 | Indian/Christmas | |
+| +08:00 | Antarctica/Casey | |
+| +08:00 | Asia/Brunei | |
+| +08:00 | Asia/Choibalsan | |
+| +08:00 | Asia/Chongqing | Asia/Chungking |
+| +08:00 | Asia/Harbin | |
+| +08:00 | Asia/Hong_Kong | Hongkong |
+| +08:00 | Asia/Irkutsk | |
+| +08:00 | Asia/Kashgar | |
+| +08:00 | Asia/Kuala_Lumpur | |
+| +08:00 | Asia/Kuching | |
+| +08:00 | Asia/Macau | Asia/Macao |
+| +08:00 | Asia/Makassar | Asia/Ujung_Pandang |
+| +08:00 | Asia/Manila | |
+| +08:00 | Asia/Shanghai | PRC |
+| +08:00 | Asia/Singapore | Singapore |
+| +08:00 | Asia/Taipei | ROC
+| +08:00 | Asia/Ulaanbaatar | Asia/Ulan_Bator |
+| +08:00 | Asia/Urumqi | |
+| +08:00 | Australia/Perth | Australia/West |
+| +08:00 | Etc/GMT-8 | |
+| +08:45 | Australia/Eucla | |
+| +09:00 | Asia/Dili | |
+| +09:00 | Asia/Jayapura | |
+| +09:00 | Asia/Pyongyang | |
+| +09:00 | Asia/Seoul | ROK |
+| +09:00 | Asia/Tokyo | Japan |
+| +09:00 | Asia/Yakutsk | |
+| +09:00 | Etc/GMT-9 | |
+| +09:00 | Pacific/Palau | |
+| +09:30 | Australia/Adelaide | Australia/South |
+| +09:30 | Australia/Broken_Hill | Australia/Yancowinna |
+| +09:30 | Australia/Darwin | Australia/North |
+| +10:00 | Antarctica/DumontDUrville | |
+| +10:00 | Asia/Sakhalin | |
+| +10:00 | Asia/Vladivostok | |
+| +10:00 | Australia/Brisbane | Australia/Queensland |
+| +10:00 | Australia/Currie | |
+| +10:00 | Australia/Hobart | Australia/Tasmania |
+| +10:00 | Australia/Lindeman | |
+| +10:00 | Australia/Melbourne | Australia/Victoria |
+| +10:00 | Australia/Sydney | Australia/ACT, Australia/Canberra, Australia/NSW |
+| +10:00 | Etc/GMT-10 | |
+| +10:00 | Pacific/Chuuk | Pacific/Truk, Pacific/Yap |
+| +10:00 | Pacific/Guam | |
+| +10:00 | Pacific/Port_Moresby | |
+| +10:00 | Pacific/Saipan | |
+| +10:30 | Australia/Lord_Howe | Australia/LHI |
+| +11:00 | Antarctica/Macquarie | |
+| +11:00 | Asia/Anadyr | |
+| +11:00 | Asia/Kamchatka | |
+| +11:00 | Asia/Magadan | |
+| +11:00 | Etc/GMT-11 | |
+| +11:00 | Pacific/Efate | |
+| +11:00 | Pacific/Guadalcanal | |
+| +11:00 | Pacific/Kosrae | |
+| +11:00 | Pacific/Noumea | |
+| +11:00 | Pacific/Pohnpei | Pacific/Ponape |
+| +11:30 | Pacific/Norfolk | |
+| +12:00 | Antarctica/McMurdo | Antarctica/South_Pole |
+| +12:00 | Etc/GMT-12 | |
+| +12:00 | Pacific/Auckland | NZ |
+| +12:00 | Pacific/Fiji | |
+| +12:00 | Pacific/Funafuti | |
+| +12:00 | Pacific/Kwajalein | Kwajalein |
+| +12:00 | Pacific/Majuro | |
+| +12:00 | Pacific/Nauru | |
+| +12:00 | Pacific/Tarawa | |
+| +12:00 | Pacific/Wake | |
+| +12:00 | Pacific/Wallis | |
+| +12:45 | Pacific/Chatham | NZ-CHAT |
+| +13:00 | Etc/GMT-13 | |
+| +13:00 | Pacific/Enderbury | |
+| +13:00 | Pacific/Tongatapu | |
+| +14:00 | Etc/GMT-14 | |
+| +14:00 | Pacific/Kiritimati | |

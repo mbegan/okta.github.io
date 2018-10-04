@@ -66,11 +66,6 @@ function oktaCustomRenderFunction(document_type, item) {
     $('.Page').toggleClass('PrimaryNav-is-active');
   });
 
-  $('.PrimaryNav .expanded .nolink').on('click', function(e){
-    e.stopPropagation();
-    e.preventDefault();
-    $(this).parent('li').toggleClass('is-active');
-  });
 
   $('#form_search #st-search-input-auto').on('keyup', function(){
       if ($(this).val().length > 0) {
@@ -97,7 +92,6 @@ function oktaCustomRenderFunction(document_type, item) {
 
   $(window).on('click', function() {
     $('.search-active').removeClass('search-active');
-    $('.PrimaryNav .expanded.is-active').removeClass('is-active');
   });
 
   $(window).on('resize', function(e){

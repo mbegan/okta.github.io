@@ -23,12 +23,6 @@ ol {
 	@include margin(small 0);
 }
 
-ul {
-	li + li {
-		margin-top: get-spacing('x-small');
-	}
-}
-
 blockquote {
 	@include margin(medium 0);
 	@include padding(x-small small);
@@ -68,4 +62,10 @@ table {
 			max-width: 15px;
 		}
 	}
+}
+
+%all-caps {
+  font-weight: get-font-weight('button');
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
 }

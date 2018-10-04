@@ -2,14 +2,18 @@
 layout: blog_post
 title: Angular Authentication with OpenID Connect and Okta in 20 Minutes
 author: mraible
+description: "In this article, you'll see how build a simple web application with Angular CLI, a tool for Angular development. You'll also create an application with search and edit features, then add authentication."
 tags: [angular, authentication, oidc, openid connect, okta, typescript, angular-cli]
+tweets:
+  - "Build a simple Angular 6 app and add authentication with @oktadev!"
+  - "Have you heard about OpenID Connect (OIDC) and how you can use it for authentication with @oktadev? This tutorial shows you how to do it in a 20 minutes →"
 ---
 
-Angular (formerly called Angular 2.0) is quickly becoming one of the most powerful ways to build a modern single-page app. A core strength is Angular’s focus on building reusable components, which help you decouple the various concerns in your application. Take authentication, for example: it can be painful to build, but once you wrap it in a component, the authentication logic can be reused throughout your application.
+Angular (formerly called Angular 2.0) is quickly becoming one of the most powerful ways to build a modern single-page app. A core strength is Angular's focus on building reusable components, which help you decouple the various concerns in your application. Take authentication, for example: it can be painful to build, but once you wrap it in a component, the authentication logic can be reused throughout your application.
 
-The Angular CLI makes it easy to scaffold new components, and even entire projects. If you haven’t used the Angular CLI to quickly generate Angular code, you’re in for a treat!
+The Angular CLI makes it easy to scaffold new components, and even entire projects. If you haven't used the Angular CLI to quickly generate Angular code, you're in for a treat!
 
-In this example, you’ll build a simple web application with Angular CLI, a tool for Angular development. You’ll create an application with search and edit features, then add authentication.
+In this example, you'll build a simple web application with Angular CLI, a tool for Angular development. You'll create an application with search and edit features, then add authentication.
 
 ## Create an Angular Application
 
@@ -24,7 +28,7 @@ git clone https://github.com/mraible/ng-demo.git
 * About 20 minutes
 * A favorite text editor or IDE. I recommend [IntelliJ IDEA](https://www.jetbrains.com/idea/)
 * [Node.js](https://nodejs.org) and npm installed. I recommend using [nvm](https://github.com/creationix/nvm)
-* [Angular CLI](https://cli.angular.io/) installed. If you don’t have Angular CLI installed, install it using `npm install -g @angular/cli`
+* [Angular CLI](https://cli.angular.io/) installed. If you don't have Angular CLI installed, install it using `npm install -g @angular/cli@1.7.3`
 
 Create a new project using the `ng new` command:
 
@@ -35,63 +39,64 @@ ng new ng-demo
 This will create a `ng-demo` project and run `npm install` in it. It should take about a minute to complete, but that could vary depending on your connection speed.
 
 ```bash
-[mraible:~/dev] $ ng new ng-demo
-installing ng
-  create .editorconfig
-  create README.md
-  create src/app/app.component.css
-  create src/app/app.component.html
-  create src/app/app.component.spec.ts
-  create src/app/app.component.ts
-  create src/app/app.module.ts
-  create src/assets/.gitkeep
-  create src/environments/environment.prod.ts
-  create src/environments/environment.ts
-  create src/favicon.ico
-  create src/index.html
-  create src/main.ts
-  create src/polyfills.ts
-  create src/styles.css
-  create src/test.ts
-  create src/tsconfig.app.json
-  create src/tsconfig.spec.json
-  create src/typings.d.ts
-  create .angular-cli.json
-  create e2e/app.e2e-spec.ts
-  create e2e/app.po.ts
-  create e2e/tsconfig.e2e.json
-  create .gitignore
-  create karma.conf.js
-  create package.json
-  create protractor.conf.js
-  create tsconfig.json
-  create tslint.json
-Successfully initialized git.
-Installing packages for tooling via npm.
-Installed packages for tooling via npm.
-You can `ng set --global packageManager=yarn`.
-Project 'ng-demo' successfully created.
-[mraible:~] 46s $
+$ ng new ng-demo
+CREATE ng-demo/README.md (1023 bytes)
+CREATE ng-demo/angular.json (3408 bytes)
+CREATE ng-demo/package.json (1311 bytes)
+CREATE ng-demo/tsconfig.json (384 bytes)
+CREATE ng-demo/tslint.json (2805 bytes)
+CREATE ng-demo/.editorconfig (245 bytes)
+CREATE ng-demo/.gitignore (503 bytes)
+CREATE ng-demo/src/environments/environment.prod.ts (51 bytes)
+CREATE ng-demo/src/environments/environment.ts (631 bytes)
+CREATE ng-demo/src/favicon.ico (5430 bytes)
+CREATE ng-demo/src/index.html (293 bytes)
+CREATE ng-demo/src/main.ts (370 bytes)
+CREATE ng-demo/src/polyfills.ts (3194 bytes)
+CREATE ng-demo/src/test.ts (642 bytes)
+CREATE ng-demo/src/assets/.gitkeep (0 bytes)
+CREATE ng-demo/src/styles.css (80 bytes)
+CREATE ng-demo/src/browserslist (375 bytes)
+CREATE ng-demo/src/karma.conf.js (964 bytes)
+CREATE ng-demo/src/tsconfig.app.json (194 bytes)
+CREATE ng-demo/src/tsconfig.spec.json (282 bytes)
+CREATE ng-demo/src/tslint.json (314 bytes)
+CREATE ng-demo/src/app/app.module.ts (314 bytes)
+CREATE ng-demo/src/app/app.component.css (0 bytes)
+CREATE ng-demo/src/app/app.component.html (1141 bytes)
+CREATE ng-demo/src/app/app.component.spec.ts (986 bytes)
+CREATE ng-demo/src/app/app.component.ts (207 bytes)
+CREATE ng-demo/e2e/protractor.conf.js (752 bytes)
+CREATE ng-demo/e2e/src/app.e2e-spec.ts (299 bytes)
+CREATE ng-demo/e2e/src/app.po.ts (208 bytes)
+CREATE ng-demo/e2e/tsconfig.e2e.json (213 bytes)
+...
+added 1147 packages from 1269 contributors in 43.48s
+    Successfully initialized git.
+Execution time: 48 sec
 ```
 
 You can see the what version of Angular CLI you're using with `ng --version`.
 
 ```bash
 $ ng --version
-    _                      _                 ____ _     ___
-   / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
-  / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
- / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
-/_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
-               |___/
-@angular/cli: 1.3.2
-node: 8.4.0
-os: darwin x64
+
+     _                      _                 ____ _     ___
+    / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
+   / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
+  / ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+ /_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+                |___/
+
+
+Angular CLI: 6.0.0
+Node: 9.8.0
+OS: darwin x64
 ```
 
 ## Run Your Angular Application
 
-The project is configured with [webpack dev server](https://webpack.github.io/docs/webpack-dev-server.html). To start it, make sure you're in the `ng-demo` directory, then run:
+The project is configured with [webpack dev server](https://github.com/webpack/webpack-dev-server). To start it, make sure you're in the `ng-demo` directory, then run:
 
 ```bash
 ng serve
@@ -106,7 +111,7 @@ You can make sure your new project's tests pass, run `ng test`:
 ```bash
 $ ng test
 ...
-Chrome 60.0.3112 (Mac OS X 10.12.6): Executed 3 of 3 SUCCESS (0.239 secs / 0.213 secs)
+Chrome 66.0.3359 (Mac OS X 10.13.4): Executed 3 of 3 SUCCESS (0.205 secs / 0.184 secs)
 ```
 
 ## Add a Search Feature
@@ -117,12 +122,11 @@ In a terminal window, cd into your project's directory and run the following com
 
 ```bash
 $ ng g component search
-installing component
-  create src/app/search/search.component.css
-  create src/app/search/search.component.html
-  create src/app/search/search.component.spec.ts
-  create src/app/search/search.component.ts
-  update src/app/app.module.ts
+CREATE src/app/search/search.component.css (0 bytes)
+CREATE src/app/search/search.component.html (25 bytes)
+CREATE src/app/search/search.component.spec.ts (628 bytes)
+CREATE src/app/search/search.component.ts (269 bytes)
+UPDATE src/app/app.module.ts (396 bytes)
 ```
 
 Open `src/app/search/search.component.html` and replace its default HTML with the following:
@@ -138,7 +142,7 @@ Open `src/app/search/search.component.html` and replace its default HTML with th
 ```
 {% endraw %}
 
-The [Router documentation](https://angular.io/docs/ts/latest/guide/router.html) for Angular provides the information you need to setup a route to the `SearchComponent` you just generated. Here's a quick summary:
+The [Router documentation](https://angular.io/guide/router) for Angular provides the information you need to setup a route to the `SearchComponent` you just generated. Here's a quick summary:
 
 In `src/app/app.module.ts`, add an `appRoutes` constant and import it in `@NgModule`:
 
@@ -210,13 +214,11 @@ To get search results, create a `SearchService` that makes HTTP requests to a JS
 
 ```bash
 $ ng g service search
-installing service
-  create src/app/search.service.spec.ts
-  create src/app/search.service.ts
-  WARNING Service is generated but not provided, it must be provided to be used
+CREATE src/app/search.service.spec.ts (374 bytes)
+CREATE src/app/search.service.ts (135 bytes)
 ```
 
-Move the generated `search.service.ts` and its test to `app/shared/search`. You’ll need to create this directory. 
+Move the generated `search.service.ts` and its test to `app/shared/search`. You'll need to create this directory.
 
 ```bash
 mkdir -p src/app/shared/search
@@ -263,20 +265,21 @@ Create `src/assets/data/people.json` to hold your data.
 ]
 ```
 
-Modify `src/app/shared/search/search.service.ts` and provide `Http` as a dependency in its constructor. In this same file, create a `getAll()` method to gather all the people. Also, define the `Address` and `Person` classes that JSON will be marshalled to.
+Modify `src/app/shared/search/search.service.ts` and provide `HttpClient` as a dependency in its constructor. In this same file, create a `getAll()` method to gather all the people. Also, define the `Address` and `Person` classes that JSON will be marshalled to.
 
 ```typescript
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import 'rxjs/add/operator/map';
+import { HttpClient } from '@angular/common/http';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class SearchService {
-  constructor(private http: Http) {}
+
+  constructor(private http: HttpClient) { }
 
   getAll() {
-    return this.http.get('assets/data/people.json')
-        .map((res: Response) => res.json());
+    return this.http.get('assets/data/people.json');
   }
 }
 
@@ -309,7 +312,7 @@ export class Person {
 }
 ```
 
-To make these classes available for consumption by your components, edit `src/app/shared/index.ts` and add the following:
+To make these classes available for consumption by your components, create `src/app/shared/index.ts` and add the following:
 
 ```typescript
 export * from './search/search.service';
@@ -330,7 +333,7 @@ export class SearchComponent implements OnInit {
   query: string;
   searchResults: Array<Person>;
 
-  constructor(private searchService: SearchService) {}
+  constructor(private searchService: SearchService) { }
 ```
 
 Then implement a `search()` method to call the service's `getAll()` method.
@@ -338,7 +341,7 @@ Then implement a `search()` method to call the service's `getAll()` method.
 ```typescript
 search(): void {
   this.searchService.getAll().subscribe(
-    data => { this.searchResults = data; },
+    (data: any) => { this.searchResults = data; },
     error => console.log(error)
   );
 }
@@ -347,23 +350,21 @@ search(): void {
 At this point, you'll likely see the following message in your browser's console.
 
 ```
-ORIGINAL EXCEPTION: No provider for SearchService!
+NullInjectorError: No provider for HttpClient!
 ```
 
-To fix the "No provider" error from above, update `app.module.ts` to import the `SearchService`
-and add the service to the list of providers. Because `SearchService` depends on `Http`, you’ll need to import `HttpModule` as well.
+To fix the "No provider" error from above, update `src/app/app.module.ts` to import `HttpClientModule`.
 
 ```typescript
-import { SearchService } from './shared';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   ...
   imports: [
     ...
-    HttpModule
+    HttpClientModule
   ],
-  providers: [SearchService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 ```
@@ -421,15 +422,20 @@ But wait, you still don't have search functionality! To add a search feature, ad
 
 ```typescript
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+...
 
-search(q: string): Observable<any> {
-  if (!q || q === '*') {
-    q = '';
-  } else {
-    q = q.toLowerCase();
+  search(q: string): Observable<any> {
+    if (!q || q === '*') {
+      q = '';
+    } else {
+      q = q.toLowerCase();
+    }
+    return this.getAll().pipe(
+      map((data: any) => data
+        .filter(item => JSON.stringify(item).toLowerCase().includes(q)))
+    );
   }
-  return this.getAll().map(data => data.filter(item => JSON.stringify(item).toLowerCase().includes(q)));
-}
 ```
 
 Then refactor `SearchComponent` to call this method with its `query` variable.
@@ -437,7 +443,7 @@ Then refactor `SearchComponent` to call this method with its `query` variable.
 ```typescript
 search(): void {
   this.searchService.search(this.query).subscribe(
-    data => { this.searchResults = data; },
+    (data: any) => { this.searchResults = data; },
     error => console.log(error)
   );
 }
@@ -461,21 +467,20 @@ Run the following command to generate an `EditComponent`.
 
 ```bash
 $ ng g component edit
-installing component
-  create src/app/edit/edit.component.css
-  create src/app/edit/edit.component.html
-  create src/app/edit/edit.component.spec.ts
-  create src/app/edit/edit.component.ts
-  update src/app/app.module.ts
+CREATE src/app/edit/edit.component.css (0 bytes)
+CREATE src/app/edit/edit.component.html (23 bytes)
+CREATE src/app/edit/edit.component.spec.ts (614 bytes)
+CREATE src/app/edit/edit.component.ts (261 bytes)
+UPDATE src/app/app.module.ts (840 bytes)
 ```
 
 Add a route for this component in `src/app/app.module.ts`:
 
 ```typescript
 const appRoutes: Routes = [
-  {path: 'search', component: SearchComponent},
-  {path: 'edit/:id', component: EditComponent},
-  {path: '', redirectTo: '/search', pathMatch: 'full'}
+  { path: 'search', component: SearchComponent },
+  { path: 'edit/:id', component: EditComponent },
+  { path: '', redirectTo: '/search', pathMatch: 'full' }
 ];
 ```
 
@@ -589,28 +594,21 @@ search(q: string): Observable<any> {
   } else {
     q = q.toLowerCase();
   }
-  return this.getAll().map(data => {
-    const results: any = [];
-    data.map(item => {
-      // check for item in localStorage
-      if (localStorage['person' + item.id]) {
-        item = JSON.parse(localStorage['person' + item.id]);
-      }
-      if (JSON.stringify(item).toLowerCase().includes(q)) {
-        results.push(item);
-      }
-    });
-    return results;
-  });
+  return this.getAll().pipe(
+    map((data: any) => data
+        .map(item => !!localStorage['person' + item.id] ?
+          JSON.parse(localStorage['person' + item.id]) : item)
+        .filter(item => JSON.stringify(item).toLowerCase().includes(q))
+    ));
 }
 
 get(id: number) {
-  return this.getAll().map(all => {
+  return this.getAll().pipe(map((all: any) => {
     if (localStorage['person' + id]) {
       return JSON.parse(localStorage['person' + id]);
     }
     return all.find(e => e.id === id);
-  });
+  }));
 }
 
 save(person: Person) {
@@ -648,7 +646,7 @@ gotoList() {
 }
 ```
 
-Since the `SearchComponent` doesn't execute a search automatically when you execute this URL, add the following logic to do so in its constructor.
+Since the `SearchComponent` doesn't execute a search automatically when you execute this URL, add the following logic to do so in its `ngOnInit` method.
 
 ```typescript
 import { ActivatedRoute } from '@angular/router';
@@ -657,7 +655,9 @@ import { Subscription } from 'rxjs';
 
 sub: Subscription;
 
-constructor(private searchService: SearchService, private route: ActivatedRoute) {
+constructor(private searchService: SearchService, private route: ActivatedRoute) { }
+
+ngOnInit() {
   this.sub = this.route.params.subscribe(params => {
     if (params['term']) {
       this.query = decodeURIComponent(params['term']);
@@ -675,7 +675,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 export class SearchComponent implements OnInit, OnDestroy {
 ...
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }
   }
 }
 ```
@@ -734,7 +736,7 @@ Now values should display in all fields and `name` should be required.
 
 {% img blog/angular-oidc/edit-form-names.png alt:"Edit form with names and validation" width:"800" %}
 
-If you want to provide your own validation messages instead of relying on the browser’s, complete the following steps:
+If you want to provide your own validation messages instead of relying on the browser's, complete the following steps:
 
 1. Remove `ngNativeValidate` and add `#editForm="ngForm"` to the `<form>` element.
 2. Add `#name="ngModel"` to the `<input id="name">` element.
@@ -747,7 +749,7 @@ If you want to provide your own validation messages instead of relying on the br
 </div>
 ```
 
-To learn more about forms and validation, see [Angular forms documentation](https://angular.io/docs/ts/latest/guide/forms.html).
+To learn more about forms and validation, see [Angular forms documentation](https://angular.io/guide/forms).
 
 ## Create an OpenID Connect App in Okta
 
@@ -755,17 +757,17 @@ OpenID Connect (OIDC) is built on top of the OAuth 2.0 protocol. It allows clien
 
 To integrate [Okta](https://developer.okta.com) for user authentication, you'll first need to [register](https://developer.okta.com/signup/) and create an OIDC application.
 
-Login to your Okta account, or [create one](https://developer.okta.com/signup/) if you don’t have one. Navigate to **Applications** and click on the **Add Application** button. Select **SPA** and click **Next**. On the next page, specify `http://localhost:4200` as a Base URI, Login redirect URI, and Logout redirect URI. Click **Done** and you should see settings like the following.
+Login to your Okta account, or [create one](https://developer.okta.com/signup/) if you don't have one. Navigate to **Applications** and click on the **Add Application** button. Select **SPA** and click **Next**. On the next page, specify `http://localhost:4200` as a Base URI, Login redirect URI, and Logout redirect URI. Click **Done** and you should see settings like the following.
 
 {% img blog/angular-oidc/oidc-settings.png alt:"OIDC App Settings" width:"700" %}{: .center-image }
 
-Install [Manfred Steyer's](https://github.com/manfredsteyer) project to [add OAuth 2 and OpenID Connect support](https://github.com/manfredsteyer/angular-oauth2-oidc) using npm.
+Install [Manfred Steyer's](https://github.com/manfredsteyer) project to [add OAuth 2 and OpenID Connect support](https://github.com/manfredsteyer/angular-oauth2-oidc) using npm. You'll also need [rxjs-compat](https://www.npmjs.com/package/rxjs-compat) since this library has not been upgraded to RxJS 6.
 
 ```bash
-npm install --save angular-oauth2-oidc
+npm install angular-oauth2-oidc rxjs-compat
 ```
 
-Modify `src/app/app.component.ts` to import `OAuthService` and configure your app to use your Okta application's settings. 
+Modify `src/app/app.component.ts` to import `OAuthService` and configure your app to use your Okta application's settings.
 
 ```typescript
 import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
@@ -774,15 +776,13 @@ import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
 
   constructor(private oauthService: OAuthService) {
     this.oauthService.redirectUri = window.location.origin;
-    this.oauthService.clientId = '{client-id}';
+    this.oauthService.clientId = '{clientId}';
     this.oauthService.scope = 'openid profile email';
-    this.oauthService.issuer = 'https://dev-{dev-id}.oktapreview.com';
+    this.oauthService.issuer = 'https://{yourOktaDomain}/oauth2/default';
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
 
     // Load Discovery Document and then try to login the user
-    this.oauthService.loadDiscoveryDocument().then(() => {
-      this.oauthService.tryLogin();
-    });
+    this.oauthService.loadDiscoveryDocumentAndTryLogin();
   }
 ...
 ```
@@ -837,7 +837,9 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthGuard implements CanActivate {
 
   constructor(private oauthService: OAuthService, private router: Router) {}
@@ -864,14 +866,14 @@ Import the `OAuthModule` in `src/app/app.module.ts`, configure the new `HomeComp
 ```typescript
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from './home/home.component';
-import { SearchService, AuthGuard } from './shared';
+import { AuthGuard } from './shared';
 
 const appRoutes: Routes = [
-  {path: 'search', component: SearchComponent, canActivate: [AuthGuard]},
-  {path: 'edit/:id', component: EditComponent, canActivate: [AuthGuard]},
-  {path: 'home', component: HomeComponent},
-  {path: '', redirectTo: 'home', pathMatch: 'full'},
-  {path: '**', redirectTo: 'home'}
+  { path: 'search', component: SearchComponent, canActivate: [AuthGuard] },
+  { path: 'edit/:id', component: EditComponent, canActivate: [AuthGuard] },
+  { path: 'home', component: HomeComponent },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home' }
 ];
 
 @NgModule({
@@ -883,10 +885,7 @@ const appRoutes: Routes = [
     ...
     OAuthModule.forRoot()
   ],
-  providers: [
-    AuthGuard,
-    SearchService
-  ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
@@ -908,29 +907,21 @@ If it works - great! If you want to build your own login form in your app, conti
 
 ### Authentication with the Okta Auth SDK
 
-The Okta Auth SDK builds on top of Otka's [Authentication API](/docs/api/resources/authn.html) and [OAuth 2.0 API](/docs/api/resources/oidc.html) to enable you to create a fully branded sign-in experience using JavaScript.
+The Okta Auth SDK builds on top of Okta's [Authentication API](/docs/api/resources/authn) and [OAuth 2.0 API](/docs/api/resources/oidc) to enable you to create a fully branded sign-in experience using JavaScript.
 
 Install it using npm:
 
 ```bash
-npm install @okta/okta-auth-js --save
-```
-
-Add a reference to this library’s main JavaScript file in `.angular-cli.json`:
-
-```json
-"scripts": [
-  "../node_modules/@okta/okta-auth-js/dist/okta-auth-js.min.js"
-],
+npm install @okta/okta-auth-js
 ```
 
 The components in this section use Bootstrap CSS classes. Install Bootstrap 4.
 
 ```bash
-npm install bootstrap@4.0.0-beta --save
+npm install bootstrap
 ```
 
-Modify `src/styles.css` to add a reference to Bootstrap’s CSS file.
+Modify `src/styles.css` to add a reference to Bootstrap's CSS file.
 
 ```css
 @import "~bootstrap/dist/css/bootstrap.css";
@@ -949,23 +940,25 @@ Update `src/app/app.component.html` to use Bootstrap classes for its navbar and 
 ```
 {% endraw %}
 
-Create `src/app/shared/auth/okta.auth.wrapper.ts` to wrap the Okta Auth SDK and integrate it with `OAuthService`. Its 
+Create `src/app/shared/auth/okta.auth.wrapper.ts` to wrap the Okta Auth SDK and integrate it with `OAuthService`. Its
 `login()` method uses `OktaAuth` to get a session token and exchange it for ID and access tokens.
 
 ```typescript
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Injectable } from '@angular/core';
+import * as OktaAuth from '@okta/okta-auth-js';
 
-declare const OktaAuth: any;
-
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class OktaAuthWrapper {
 
   private authClient: any;
 
   constructor(private oauthService: OAuthService) {
     this.authClient = new OktaAuth({
-      url: this.oauthService.issuer
+      url: 'https://{yourOktaDomain}',
+      issuer: 'default'
     });
   }
 
@@ -988,7 +981,7 @@ export class OktaAuthWrapper {
               const idToken = tokens[0].idToken;
               const accessToken = tokens[1].accessToken;
               const keyValuePair = `#id_token=${encodeURIComponent(idToken)}&access_token=${encodeURIComponent(accessToken)}`;
-              return this.oauthService.tryLogin({ <1>
+              return this.oauthService.tryLogin({
                 customHashFragment: keyValuePair,
                 disableOAuth2StateCheck: true
               });
@@ -1002,7 +995,7 @@ export class OktaAuthWrapper {
 }
 ```
 
-In the above code, `oauthService.tryLogin()` parses and stores the `idToken` and `accessToken` so they can be retrieved 
+In the above code, `oauthService.tryLogin()` parses and stores the `idToken` and `accessToken` so they can be retrieved
 using `OAuthService.getIdToken()` and `OAuthService.getAccessToken()`.
 
 Export `OktaAuthWrapper` in `src/shared/index.ts`:
@@ -1011,22 +1004,7 @@ Export `OktaAuthWrapper` in `src/shared/index.ts`:
 export * from './auth/okta.auth.wrapper';
 ```
 
-Add `OktaAuthWrapper` as a provider in `app.module.ts`.
-
-```typescript
-import { SearchService, AuthGuard, OktaAuthWrapper } from './shared';
-
-@NgModule({
-  ...
-  providers: [
-    ...
-    OktaAuthWrapper
-  ],
-  bootstrap: [AppComponent]
-})
-```
-
-Change `HomeComponent` to declare `OktaAuth` and modify its `template` so it has a button to login, as well as a sign-in form.
+Change `HomeComponent` to modify its `template` so it has a button to login, as well as a sign-in form.
 
 {% raw %}
 ```typescript
@@ -1089,7 +1067,6 @@ constructor(private oauthService: OAuthService,
 
 loginWithPassword() {
   this.oktaAuthWrapper.login(this.username, this.password)
-    .then(_ => console.debug('logged in'))
     .catch(err => console.error('error logging in', err));
 }
 ```
@@ -1102,7 +1079,7 @@ You should be able to sign in using the form, using one of your app's registered
 
 If everything works - congrats! If you encountered issues, please post a question to Stack Overflow with an [okta tag](http://stackoverflow.com/questions/tagged/okta), or hit me up on Twitter [@mraible](https://twitter.com/mraible).
 
-You can find a completed version of the application created in this blog post [on GitHub](https://github.com/oktadeveloper/okta-angular-openid-connect-example). To learn more about security in Angular, see [Angular’s Security documentation](https://angular.io/guide/security). If you’d like to learn more about OpenID Connect, I’d recommend watching the soothing video below.
+You can find a completed version of the application created in this blog post [on GitHub](https://github.com/oktadeveloper/okta-angular-openid-connect-example). To learn more about security in Angular, see [Angular's Security documentation](https://angular.io/guide/security). If you'd like to learn more about OpenID Connect, I'd recommend watching the soothing video below.
 
 <div style="max-width: 560px; margin: 0 auto">
 <iframe width="560" height="315" src="https://www.youtube.com/embed/Kb56GzQ2pSk" frameborder="0" allowfullscreen></iframe>
@@ -1110,8 +1087,11 @@ You can find a completed version of the application created in this blog post [o
 
 **Changelog:**
 
-* Aug 31, 2017: Updated to use Angular CLI 1.3.2 and angular-oauth2-oidc 2.0.12. See the code changes in the [example app on GitHub](https://github.com/oktadeveloper/okta-angular-openid-connect-example/pull/2/files).
+* May 8, 2018: Updated to use Angular CLI 6.0, Angular 6.0, and Okta Sign-In Widget 2.8.0. See the code changes in [okta-angular-openid-connect-example#5](https://github.com/oktadeveloper/okta-angular-openid-connect-example/pull/5) and the article changes in [okta.github.io#2030](https://github.com/okta/okta.github.io/pull/2030).
+* Nov 30, 2017: Updated to use Angular CLI 1.5.5 and angular-oauth2-oidc 3.0.1. See the code changes in the [example app on GitHub](https://github.com/oktadeveloper/okta-angular-openid-connect-example/pull/3/files). Changes to this article can be viewed [in this pull request](https://github.com/okta/okta.github.io/pull/1517).
 * Sep 28, 2017: Updated "create an OIDC app" instructions for the [Okta Developer Console](/blog/2017/09/25/all-new-developer-console).
+* Aug 31, 2017: Updated to use Angular CLI 1.3.2 and angular-oauth2-oidc 2.0.12. See the code changes in the [example app on GitHub](https://github.com/oktadeveloper/okta-angular-openid-connect-example/pull/2/files).
+
 
 
 

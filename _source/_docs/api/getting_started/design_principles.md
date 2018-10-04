@@ -1,6 +1,6 @@
 ---
 layout: docs_page
-weight: 4
+weight: 1
 title: Design Principles
 redirect_from:
   - "/docs/getting_started/design_principles.html"
@@ -80,13 +80,13 @@ Used for deleting resources.
 
 ## Client Request Context
 
-Okta will derive client request context directly from the HTTP request headers and client TCP socket.  Request context is used to evaluate policies such as **Okta Sign-On Policy** and provide client information for [troubleshooting and auditing](../resources/events.html#client-objecttype) purposes.
+Okta will derive client request context directly from the HTTP request headers and client TCP socket.  Request context is used to evaluate policies such as **Okta Sign-On Policy** and provide client information for [troubleshooting and auditing](../resources/events#client-objecttype) purposes.
 
 ### User Agent
 
-Okta supports the standard `User-Agent` HTTP header to identify the user's browser or application.  You should always send a `User-Agent` string to uniquely identify your client application and version such as `Oktaprise/1.1`.
+Okta supports the standard `User-Agent` HTTP header to identify the user's browser or application. Always send a `User-Agent` string to uniquely identify your client application and version such as `Oktaprise/1.1`.
 
-> If your application is acting as a gateway or proxy, you should forward the `User-Agent` of the originating client with your API requests
+> If your application is acting as a gateway or proxy, you should forward the `User-Agent` of the originating client with your API requests.
 
 ### IP Address
 
@@ -94,6 +94,13 @@ The **public IP address** of your application will be automatically used as the 
 
 > The **public IP address** of your trusted web application must be whitelisted in your [org's network security settings](https://help.okta.com/en/prod/Content/Topics/Security/Security_Network.htm) as a trusted gateway in order to forward the user agent's original IP address with the `X-Forwarded-For` HTTP header.
 
+### Accept Language
+
+The `Accept-Language` HTTP header advertises which languages the client is able to understand, for example `Accept-Language: en-US`. Include it if it is available.
+
+### Device Fingerprint
+
+The `X-Device-Fingerprint` HTTP header supplies the device fingerprint used in an authentication request.
 
 ## Errors
 
@@ -122,7 +129,7 @@ All requests that result in an error will return the appropriate 4xx or 5xx erro
 }
 ~~~
 
-See [Error Codes](error_codes.html) for a list of API error codes.
+See [Error Codes](error_codes) for a list of API error codes.
 
 > Only the `errorCode` property is supported for runtime error flow control.  The `errorSummary` property is only intended for troubleshooting and may change over time.
 
@@ -130,17 +137,17 @@ See [Error Codes](error_codes.html) for a list of API error codes.
 
 The Okta API currently requires the custom HTTP authentication scheme `SSWS` for authentication. All requests must have a valid API key specified in the HTTP `Authorization` header with the `SSWS` scheme.
 
-    Authorization: SSWS 00QCjAl4MlV-WPXM…0HmjFx-vbGua
+    Authorization: SSWS 00QCjAl4MlV-WPXM...0HmjFx-vbGua
 
-> See [Obtaining a token](getting_a_token.html) for instructions on how to get an API key for your organization.
+> See [Obtaining a token](getting_a_token) for instructions on how to get an API key for your organization.
 
-The API key (API token) isn't interchangeable with an Okta [session token](/docs/api/resources/authn.html#session-token), access tokens or ID tokens used with [OAuth 2.0 and OpenID Connect](/docs/api/resources/oauth2.html).
+The API key (API token) isn't interchangeable with an Okta [session token](/docs/api/resources/authn#session-token), access tokens or ID tokens used with [OAuth 2.0 and OpenID Connect](/docs/api/resources/oauth2).
 
 ## Pagination
 
 Requests that return a list of resources may support paging.  Pagination is based on a cursor and not on page number. The cursor is opaque to the client and specified in either the `before` or `after` query parameter.  For some resources, you can also set a custom page size with the `limit` parameter.
 
-Note that for technical reasons not all APIs respect pagination or the `before` and `limit` parameters, see the [Events API](/docs/api/resources/events.html) for example.
+Note that for technical reasons not all APIs respect pagination or the `before` and `limit` parameters, see the [Events API](/docs/api/resources/events) for example.
 
 Param    | Description
 -------- | ------------
@@ -154,8 +161,8 @@ Pagination links are included in the [Link header](http://tools.ietf.org/html/rf
 
 ~~~ http
 HTTP/1.1 200 OK
-Link: <https://{yourOktaDomain}.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>; rel="next",
-  <https://{yourOktaDomain}.com/api/v1/users?after=00ub4tTFYKXCCZJSGFKM>; rel="self"
+Link: <https://{yourOktaDomain}/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>; rel="next",
+  <https://{yourOktaDomain}/api/v1/users?after=00ub4tTFYKXCCZJSGFKM>; rel="self"
 ~~~
 
 The possible `rel` values are:
@@ -166,7 +173,11 @@ Link Relation Type | Description
 `next`             | Specifies the URL of the immediate next page of results.
 `prev`             | Specifies the URL of the immediate previous page of results.
 
-When you first make an API call and get a cursor-paged list of objects, the end of the list will be the point at which you do not receive another `next` link value with the response. The behavior is different in the [Events API](/docs/api/resources/events.html). In the [Events API](/docs/api/resources/events.html), the next link always exists, since that connotation is more like a cursor or stream of data. The other APIs are primarily fixed data lengths.
+When you first make an API call and get a cursor-paged list of objects, the end of the list will be the point at which you do not receive another `next` link value with the response. This holds true for all but two cases:
+
+1. [Events API](/docs/api/resources/events): The `next` link always exists, since the [Events API](/docs/api/resources/events) is like a stream of data with a cursor.
+
+2. [System Log API](/docs/api/resources/system_log): The `next` link will always exist in polling queries in the [System Log API](/docs/api/resources/system_log). A polling query is defined as an `ASCENDING` query with an empty or absent `until` parameter. Like in the [Events API](/docs/api/resources/events), the polling query is a stream of data.
 
 ## Filtering
 
@@ -219,7 +230,7 @@ Filters must be evaluated using standard order of operations. Attribute operator
 
 ## Hypermedia
 
-Resources in the Okta API use hypermedia for "discoverability".  Hypermedia enables API clients to navigate  resources by following links like a web browser instead of hard-coding URLs in your application.  Links are identified by link relations which are named keys. Link relations describe what resources are available and how they can be interacted with.  Each resource may publish a set of link relationships based on the state of the resource.  For example, the status of a user in the [User API](/docs/api/resources/users.html#links-object) will govern which lifecycle operations are permitted.  Only the permitted operations will be published as lifecycle operations.
+Resources in the Okta API use hypermedia for "discoverability".  Hypermedia enables API clients to navigate  resources by following links like a web browser instead of hard-coding URLs in your application.  Links are identified by link relations which are named keys. Link relations describe what resources are available and how they can be interacted with.  Each resource may publish a set of link relationships based on the state of the resource.  For example, the status of a user in the [User API](/docs/api/resources/users#links-object) will govern which lifecycle operations are permitted.  Only the permitted operations will be published as lifecycle operations.
 
 The Okta API had incorporated [JSON Hypertext Application Language](http://tools.ietf.org/html/draft-kelly-json-hal-06) or HAL format as the foundation for hypermedia "discoverability".  HAL provides a set of conventions for expressing hyperlinks in JSON responses representing two simple concepts: Resources and Links.
 
@@ -252,12 +263,12 @@ Object whose property names are link relation types (as defined by [RFC5988](htt
         "logo": [
             {
               "name": "medium",
-              "href": "https://{yourOktaDomain}.com/assets/img/logos/groups/active_directory-medium.b3959116154f9d44bd4d0f6b2ae31ea6.png",
+              "href": "https://{yourOktaDomain}/assets/img/logos/groups/active_directory-medium.b3959116154f9d44bd4d0f6b2ae31ea6.png",
               "type": "image/png"
             },
             {
               "name": "large",
-              "href": "https://{yourOktaDomain}.com/assets/img/logos/groups/active_directory-large.0e7a58559ac90c4bbc7b33fa14018c50.png",
+              "href": "https://{yourOktaDomain}/assets/img/logos/groups/active_directory-large.0e7a58559ac90c4bbc7b33fa14018c50.png",
               "type": "image/png"
             }
          ],
@@ -267,242 +278,15 @@ Object whose property names are link relation types (as defined by [RFC5988](htt
 }
 ~~~
 
-#### Links in collections
+### Links in Collections
 
 Note that HAL links returned in a collection of resources may not reflect the total set of operations that are possible on that resource.  For example, in a user collection links indicating that a given user can be "unlocked" may not be returned and, if returned, may not reflect the correct user state.
 
 Search and list operations are intended to find matching resources and their identifiers. If you intend to search for a resource and then modify its state or make a lifecycle change, the correct pattern is to first retrieve the resource by 'id' using the "self" link provided for that resource in the collection. This will provide the full set of lifecycle links for that resource based on its most up-to-date state.
 
-## Rate Limiting
-
-The number of API requests for an organization is limited for all APIs based on your edition.
-
-Okta provides three headers in each response. These headers show the limit that is being enforced, when it resets, and how close you are to hitting the limit:
-
-`X-Rate-Limit-Limit` - the rate limit ceiling that is applicable for the current request.
-
-`X-Rate-Limit-Remaining` - the number of requests left for the current rate-limit window.
-
-`X-Rate-Limit-Reset` - the time at which the rate limit will reset, specified in UTC epoch time.
-
-~~~ http
-HTTP/1.1 200 OK
-X-Rate-Limit-Limit: 20
-X-Rate-Limit-Remaining: 15
-X-Rate-Limit-Reset: 1366037820
-~~~
-
-If a rate limit is exceeded, an HTTP 429 Status Code is returned.
-
-**Rate limits are enforced for all organizations.**
-
-The best way to be sure about your rate limits is to check the relevant headers in the response. The System Log doesn't report every
-API request. Rather, it typically reports completed or attempted real-world events such as configuration changes, user logins, or user lockouts.
-The System Log doesn’t report the rate at which you’ve been calling the API.
-
-Okta has two types of rate limits: concurrent rate limits for the number
-of simultaneous transactions, and org-wide rate limits that vary by API
-endpoint.
-
-### Org-Wide Rate Limits
-
-API rate limits apply per minute to the endpoints in an org. The rate applies either to all the endpoints with the same base URL or to an exact URL, as noted in the following table.
-
-| Okta API Endpoint                                                                             | Limit |
-|:----------------------------------------------------------------------------------------------|------:|
-| `/api/v1/apps`                                                                                |   100 |
-| `/api/v1/apps/{id}` (exact URL only)                                                          |   500 |
-| `/api/v1/authn`                                                                               |   500 |
-| `/api/v1/groups/{id}` (exact URL only)                                                        |  1000 |
-| `/api/v1/groups`                                                                              |   500 |
-| `/api/v1/logs`                                                                                |    60 |
-| `/api/v1/sessions`                                                                            |   750 |
-| `/api/v1/users/{id}` GET (exact URL plus query params or other qualifiers)                    |  2000 |
-| `/api/v1/users/{id}` All other HTTP methods (exact URL plus query params or other qualifiers) |   600 |
-| `/api/v1/users`                                                                               |   600 |
-| `/api/v1/` (if no other `/api/v1` limit specified in this table)                              |  1200 |
-| `/oauth2/v1/token`  (per second, not minute)                                                  |     4 |
-| `/oauth2/v1` (per second, not minute)                                                         |    40 |
-
-For all API endpoints not listed in the table above, the API rate limit is a combined 10,000 requests per minute.
-
-End-user endpoints have org-wide rate limits as well:
-
-| Okta End-User Endpoints                  | Limit |
-|:-----------------------------------------|------:|
-| `/app/{app}/{key}/sso/saml`              |   750 |
-| `/app/office365/{key}/sso/wsfed/active`  |  2000 |
-| `/app/office365/{key}/sso/wsfed/passive` |   250 |
-| `/app/template_saml_2_0/{key}/sso/saml`  |  2500 |
-| `/login/do-login`                        |   200 |
-| `/login/login.htm`                       |   850 |
-| `/login/sso_iwa_auth`                    |   500 |
-
-#### Example Rate Limit Header with Org-Wide Rate Limit Error  
-
-This example shows the relevant portion of a rate limit header being
-returned with the error for a request that exceeded the concurrent rate
-limit.
-
-~~~http
-
-HTTP/1.1 429 
-Date: Tue, 26 Sep 2017 21:33:25 GMT
-X-Rate-Limit-Limit: 5000
-X-Rate-Limit-Remaining: 4198
-X-Rate-Limit-Reset: 1605463723
-
-~~~
-
-### Concurrent Rate Limits
-
-In order to protect the service for all customers, Okta enforces concurrent rate limits starting with this release.
-Concurrent limits are distinct from [the org-wide, per-minute API rate limits](#org-wide-rate-limits).
-
-For concurrent rate limits, traffic is measured in three different areas. Counts in one area aren't included in counts for the other two:
-
-* For agent traffic, Okta measured each org's traffic and set the limit above the highest usage in the last four weeks.
-* For Office365 traffic, the limit is 75 concurrent transactions per org.
-* For all other traffic including API requests, the limit is 75 concurrent transactions per org.
-
-Okta has verified that these limits are sufficient based on current usage or grandfathered higher limits for those orgs that have historically exceeded this limit.
-
-Any request that would cause us to exceed the concurrent limit returns an HTTP 429 error, and the first error every 60 seconds is written to the log.
-Reporting concurrent rate limits once a minute keeps log volume manageable. 
-
-#### Example Error Response Events
-
-~~~json
-{
-    "eventId": "tevEVgTHo-aQjOhd1OZ7QS3uQ1506395956000",
-    "sessionId": "102oMlafQxwTUGJMLL8FhVNZA",
-    "requestId": "reqIUuPHG7ZSEuHGUXBZxUXEw",
-    "published": "2017-09-26T03:19:16.000Z",
-    "action": {
-      "message": "Too many concurrent requests in flight",
-      "categories": [],
-      "objectType": "core.concurrency.org.limit.violation",
-      "requestUri": "/report/system_log"
-    },
-    "actors": [
-      {
-        "id": "00uo7fD8dXTeWU3g70g3",
-        "displayName": "Test User",
-        "login": "test-user@test.net",
-        "objectType": "User"
-      },
-      {
-        "id": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36",
-        "displayName": "CHROME",
-        "ipAddress": "127.0.0.1",
-        "objectType": "Client"
-      }
-    ],
-    "targets": []
-  }
-~~~
-
-#### Example Error Response for System Log API (Beta)
-
-~~~json
-{
-        "actor": {
-            "alternateId": "test.user@test.com",
-            "detailEntry": null,
-            "displayName": "Test User",
-            "id": "00u1qqxig80SMWArY0g7",
-            "type": "User"
-        },
-        "authenticationContext": {
-            "authenticationProvider": null,
-            "authenticationStep": 0,
-            "credentialProvider": null,
-            "credentialType": null,
-            "externalSessionId": "trs2TSSLkgWR5iDuebwuH9Vsw",
-            "interface": null,
-            "issuer": null
-        },
-        "client": {
-            "device": "Unknown",
-            "geographicalContext": null,
-            "id": null,
-            "ipAddress": "4.15.16.10",
-            "userAgent": {
-                "browser": "UNKNOWN",
-                "os": "Unknown",
-                "rawUserAgent": "Apache-HttpClient/4.5.2 (Java/1.7.0_76)"
-            },
-            "zone": "null"
-        },
-        "debugContext": {
-            "debugData": {
-                "requestUri": "/api/v1/users"
-            }
-        },
-        "displayMessage": "Too many requests in flight",
-        "eventType": "core.concurrency.org.limit.violation",
-        "legacyEventType": "core.concurrency.org.limit.violation",
-        "outcome": null,
-        "published": "2017-09-26T20:21:32.783Z",
-        "request": {
-            "ipChain": [
-                {
-                    "geographicalContext": null,
-                    "ip": "4.15.16.10",
-                    "source": null,
-                    "version": "V4"
-                },
-                {
-                    "geographicalContext": null,
-                    "ip": "52.22.142.162",
-                    "source": null,
-                    "version": "V4"
-                }
-            ]
-        },
-        "securityContext": {
-            "asNumber": null,
-            "asOrg": null,
-            "domain": null,
-            "isProxy": null,
-            "isp": null
-        },
-        "severity": "INFO",
-        "target": null,
-        "transaction": {
-            "detail": {},
-            "id": "Wcq2zDtj7xjvEu-gRMigPwAACYM",
-            "type": "WEB"
-        },
-        "uuid": "dc7e2385-74ba-4b77-827f-fb84b37a4b3b",
-        "version": "0"
-    }
-~~~
-  
-#### Example Rate Limit Header with Concurrent Rate Limit Error  
-
-This example shows the relevant portion of a rate limit header being returned with the error for a request that exceeded the concurrent rate limit.
-~~~http
-
-HTTP/1.1 429 
-Date: Tue, 26 Sep 2017 21:33:25 GMT
-X-Rate-Limit-Limit: 0
-X-Rate-Limit-Remaining: 0
-X-Rate-Limit-Reset: 1506461721
-
-~~~
-
-Notice that instead of the typical counts for time-based rate limits, when a request exceeds the limit for concurrent requests,
-`X-Rate-Limit-Limit`, `X-Rate-Limit-Remaining`, and `X-Rate-Limit-Reset` report the concurrent values instead. 
-When the number of unfinished requests is below the concurrent rate limit, request headers will switch back to reporting the time-based rate limits.
-
-The `X-Rate-Limit-Reset` time for concurrent rate limits is only a
-suggestion. There's no guarantee that enough requests will complete to
-stop exceeding the concurrent rate limit at the time indicated.
-
 ## Request Debugging
 
-The request ID will always be present in every API response and can be used for debugging. This value can be used to correlate events from the [Events API](/docs/api/resources/events.html) as well as the System Log events.
+The request ID will always be present in every API response and can be used for debugging. This value can be used to correlate events from the [Events API](/docs/api/resources/events) as well as the System Log events.
 
 The following header is set in each response:
 
@@ -518,13 +302,13 @@ X-Okta-Request-Id: reqVy8wsvmBQN27h4soUE3ZEnA
 
 [Cross-Origin Resource Sharing (CORS)](http://en.wikipedia.org/wiki/Cross-Origin_Resource_Sharing) is a mechanism that allows a web page to make an AJAX call using [XMLHttpRequest (XHR)](http://en.wikipedia.org/wiki/XMLHttpRequest) to a domain that is  different from the one from where the script was loaded.  Such "cross-domain" requests would otherwise be forbidden by web browsers, per the [same origin security policy](http://en.wikipedia.org/wiki/Same_origin_policy).  CORS defines a [standardized](http://www.w3.org/TR/cors/) way in which the browser and the server can interact to determine whether or not to allow the cross-origin request.
 
-In Okta, CORS allows JavaScript hosted on your websites to make an XHR to the Okta API with the Okta session cookie. Every website origin must be explicitly permitted via the Okta Admin Dashboard for CORS.  See [Enabling CORS](./enabling_cors.html) for details on how to allow your website to make cross-origin requests.
+In Okta, CORS allows JavaScript hosted on your websites to make an XHR to the Okta API with the Okta session cookie. Every website origin must be explicitly permitted via the administrator UI for CORS.  See [Enabling CORS](enabling_cors) for details on how to allow your website to make cross-origin requests.
 
 > **Caution:** Only grant access to specific origins (websites) that you control and trust to access the Okta API.
 
 ### API Support
 
-The Okta API supports CORS on an API by API basis. If you’re building an application that needs CORS, please check that the specific operation supports CORS for your use case. APIs that support CORS are marked with the following icon <span class="api-label api-label-small api-label-cors"><i class="fa fa-cloud-download"></i> CORS</span>.
+The Okta API supports CORS on an API by API basis. If you're building an application that needs CORS, please check that the specific operation supports CORS for your use case. APIs that support CORS are marked with the following icon <span class="api-label api-label-small api-label-cors"><i class="fa fa-cloud-download"></i> CORS</span>.
 
 ## Additional Help
 
